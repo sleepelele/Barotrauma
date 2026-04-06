@@ -182,6 +182,73 @@
     .decl-item:has(input:checked) .avail-label { color:var(--text-bright); }
     .decl-item.decl-required { border-color:transparent; }
     .decl-item.decl-required .avail-box { border-color:var(--danger2); }
+
+    /* ── MINI GAMES ── */
+    .game-wrap { position:relative; background:rgba(4,10,16,0.8); border:1px solid var(--border); padding:20px; margin-top:4px; }
+    .game-msg { font-family:'Share Tech Mono',monospace; font-size:0.8rem; margin-top:12px; min-height:1.4em; text-align:center; letter-spacing:0.1em; }
+    .game-msg.pass  { color:var(--success); }
+    .game-msg.fail  { color:var(--danger2); }
+    .game-msg.info  { color:var(--warn); }
+    .game-retry { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); cursor:pointer; border:1px solid var(--border); background:transparent; padding:5px 14px; margin-top:8px; transition:all 0.2s; }
+    .game-retry:hover { border-color:var(--accent); color:var(--accent); }
+    .game-section-label { font-family:'Orbitron',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:0.2em; color:var(--rust); text-transform:uppercase; margin-bottom:6px; display:block; }
+
+    /* GAME 1: Cables */
+    .cable-game { display:flex; align-items:stretch; gap:0; min-height:220px; position:relative; }
+    .cable-col { display:flex; flex-direction:column; justify-content:space-around; padding:10px 0; z-index:2; }
+    .cable-port { display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; border:1px solid transparent; transition:all 0.2s; user-select:none; }
+    .cable-port:hover { border-color:rgba(255,255,255,0.1); }
+    .cable-port.selected { border-color:var(--accent); background:rgba(138,173,90,0.08); }
+    .cable-port.connected { opacity:0.6; cursor:default; }
+    .port-dot { width:16px; height:16px; border-radius:50%; background:var(--pc,#888); flex-shrink:0; box-shadow:0 0 8px var(--pc,#888); border:2px solid rgba(255,255,255,0.2); }
+    .port-label { font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--text-dim); letter-spacing:0.1em; }
+    .cable-port.right-port { flex-direction:row-reverse; }
+    .cable-canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+
+    /* GAME 2: Hull */
+    .hull-game { position:relative; height:180px; }
+    .hull-svg { width:100%; height:100%; }
+    .hull-timer-bar { height:4px; background:var(--border); margin-bottom:10px; }
+    .hull-timer-fill { height:100%; background:var(--success); transition:width 0.1s linear; width:100%; }
+    .leak-spot { cursor:pointer; animation:leakPulse 0.8s ease-in-out infinite; }
+    .leak-spot.patched { animation:none; }
+    @keyframes leakPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+    .leak-spot circle { transition:all 0.3s; }
+
+    /* GAME 3: Drug ID */
+    .drug-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media(max-width:520px){.drug-grid{grid-template-columns:1fr}}
+    .drug-card { border:1px solid var(--border); background:rgba(4,10,16,0.6); padding:14px; cursor:pointer; transition:all 0.2s; }
+    .drug-card:hover { border-color:var(--border2); background:rgba(17,34,51,0.8); }
+    .drug-card.selected-wrong { border-color:var(--danger2)!important; background:rgba(122,32,32,0.15)!important; animation:shakeIt 0.4s ease; }
+    .drug-card.selected-right { border-color:var(--success)!important; background:rgba(106,170,58,0.12)!important; }
+    @keyframes shakeIt { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .drug-name { font-family:'Orbitron',sans-serif; font-size:0.72rem; font-weight:700; color:var(--rust); letter-spacing:0.1em; margin-bottom:6px; }
+    .drug-desc { font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--text-dim); line-height:1.6; }
+
+    /* GAME 4: Reactor */
+    .reactor-game { display:flex; gap:20px; align-items:center; }
+    @media(max-width:560px){.reactor-game{flex-direction:column;}}
+    .reactor-gauge-wrap { flex-shrink:0; }
+    .reactor-buttons { display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; }
+    .reactor-btn { font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--text-dim); border:1px solid var(--border); background:rgba(4,10,16,0.7); padding:10px 8px; cursor:pointer; transition:all 0.2s; letter-spacing:0.06em; }
+    .reactor-btn:hover { border-color:var(--border2); color:var(--text); }
+    .reactor-btn.wrong-btn { border-color:var(--danger2)!important; color:var(--danger2)!important; animation:shakeIt 0.4s ease; }
+    .reactor-btn.right-btn { border-color:var(--success)!important; color:var(--success)!important; }
+    .reactor-pct { font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:900; text-anchor:middle; dominant-baseline:central; }
+
+    /* GAME 5: Spot the Clown */
+    .crew-lineup { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .crew-member { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; padding:12px 10px; border:1px solid transparent; transition:all 0.2s; min-width:80px; user-select:none; }
+    .crew-member:hover { border-color:var(--border); background:rgba(138,173,90,0.03); }
+    .crew-member.is-clown { /* hidden until found */ }
+    .crew-member.wrong-pick { border-color:var(--danger2)!important; background:rgba(122,32,32,0.12)!important; animation:shakeIt 0.3s ease; }
+    .crew-member.right-pick { border-color:var(--success)!important; background:rgba(106,170,58,0.1)!important; }
+    .crew-avatar { font-size:2.4rem; line-height:1; }
+    .crew-name { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--text-dim); letter-spacing:0.08em; }
+    .clown-timer { height:3px; background:var(--border); margin-bottom:12px; }
+    .clown-timer-fill { height:100%; background:var(--danger2); width:100%; transition:width 0.1s linear; }
+
     input.err,textarea.err{border-color:var(--danger2)!important;box-shadow:0 0 6px rgba(196,48,48,0.3)!important;}
     .err-msg{font-family:'Share Tech Mono',monospace;font-size:0.66rem;color:var(--danger2);margin-top:5px;display:none;}
     .err-msg.show{display:block;}
@@ -470,12 +537,11 @@ If you are reading this notice and still considering applying — welcome. You'r
       <label class="field-label">You see the hull leaking water. What do you do?</label>
       <span class="field-hint">We are at 2,000 meters. Please consider your answer carefully.</span>
       <div class="mcq-grid">
-        <div class="mcq-btn" data-group="hull" data-val="A - Put a bucket below">A) &nbsp;Put a bucket below the leak</div>
-        <div class="mcq-btn" data-group="hull" data-val="B - Call for Engineer">B) &nbsp;Call for Engineer</div>
-        <div class="mcq-btn" data-group="hull" data-val="C - Stuff it with a towel">C) &nbsp;Stuff it with a towel</div>
-        <div class="mcq-btn" data-group="hull" data-val="D - Ignore it">D) &nbsp;Ignore it — it's just a small leak</div>
+        <label class="mcq-option"><input type="radio" name="hull" value="A) Put a bucket below the leak"/><span class="mcq-letter">A</span><span class="mcq-text">Put a bucket below the leak</span></label>
+        <label class="mcq-option"><input type="radio" name="hull" value="B) Call for Engineer"/><span class="mcq-letter">B</span><span class="mcq-text">Call for Engineer</span></label>
+        <label class="mcq-option"><input type="radio" name="hull" value="C) Stuff it with a towel"/><span class="mcq-letter">C</span><span class="mcq-text">Stuff it with a towel</span></label>
+        <label class="mcq-option"><input type="radio" name="hull" value="D) Ignore it, just a small leak"/><span class="mcq-letter">D</span><span class="mcq-text">Ignore it — it's just a small leak</span></label>
       </div>
-      <input type="hidden" id="f-hull" value=""/>
     </div>
 
 <!-- FIELD 14: Morphine defense -->
@@ -486,7 +552,157 @@ If you are reading this notice and still considering applying — welcome. You'r
       <textarea id="f-morphine" placeholder="I can explain. Actually, I cannot explain. But here is what happened..."></textarea>
     </div>
 
-    <!-- FIELD 15: Declarations -->
+
+    <!-- BONUS GAMES -->
+    <div class="section">
+      <span class="section-tag">ASSESSMENT 01</span>
+      <span class="game-section-label">⚡ Practical Skills Assessment — Electrical</span>
+      <label class="field-label">Cable Routing Test</label>
+      <span class="field-hint">Connect each power source on the left to its matching port on the right. Click a left port, then click the matching right port. Zez failed this 4 times.</span>
+      <div class="game-wrap">
+        <div class="cable-game" id="cableGame">
+          <div class="cable-col" id="cableLeft">
+            <div class="cable-port left-port" data-color="red"    style="--pc:#c43030"><span class="port-dot"></span><span class="port-label">POWER</span></div>
+            <div class="cable-port left-port" data-color="blue"   style="--pc:#3070c4"><span class="port-dot"></span><span class="port-label">COOLANT</span></div>
+            <div class="cable-port left-port" data-color="green"  style="--pc:#4caf72"><span class="port-dot"></span><span class="port-label">OXYGEN</span></div>
+            <div class="cable-port left-port" data-color="yellow" style="--pc:#d4a843"><span class="port-dot"></span><span class="port-label">SIGNAL</span></div>
+          </div>
+          <canvas id="cableCanvas" class="cable-canvas"></canvas>
+          <div class="cable-col" id="cableRight" style="align-items:flex-end;">
+            <div class="cable-port right-port" data-color="green"  style="--pc:#4caf72"><span class="port-label">PORT C</span><span class="port-dot"></span></div>
+            <div class="cable-port right-port" data-color="red"    style="--pc:#c43030"><span class="port-label">PORT A</span><span class="port-dot"></span></div>
+            <div class="cable-port right-port" data-color="yellow" style="--pc:#d4a843"><span class="port-label">PORT D</span><span class="port-dot"></span></div>
+            <div class="cable-port right-port" data-color="blue"   style="--pc:#3070c4"><span class="port-label">PORT B</span><span class="port-dot"></span></div>
+          </div>
+        </div>
+        <div class="game-msg" id="cableMsg">Select a left port to begin.</div>
+        <button type="button" class="game-retry" onclick="resetCables()" style="display:block;margin:8px auto 0;">↺ Reset</button>
+      </div>
+      <input type="hidden" id="f-cables" value="not attempted"/>
+    </div>
+
+    <div class="section">
+      <span class="section-tag">ASSESSMENT 02</span>
+      <span class="game-section-label">🔧 Practical Skills Assessment — Damage Control</span>
+      <label class="field-label">Hull Breach Repair</label>
+      <span class="field-hint">Three hull breaches detected. Click each leak to patch it before the timer runs out. We are at depth. This is not a drill. It is also not NOT a drill.</span>
+      <div class="game-wrap">
+        <div class="hull-timer-bar"><div class="hull-timer-fill" id="hullTimerFill"></div></div>
+        <div class="hull-game">
+          <svg id="hullSvg" class="hull-svg" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
+            <!-- Submarine hull outline -->
+            <ellipse cx="250" cy="80" rx="220" ry="55" fill="none" stroke="#1e3a50" stroke-width="3"/>
+            <ellipse cx="250" cy="80" rx="215" ry="50" fill="rgba(9,20,32,0.8)" stroke="#2a4e68" stroke-width="1"/>
+            <!-- Conning tower -->
+            <rect x="200" y="28" width="80" height="30" rx="4" fill="rgba(9,20,32,0.9)" stroke="#1e3a50" stroke-width="2"/>
+            <!-- Periscope -->
+            <line x1="240" y1="28" x2="240" y2="10" stroke="#1e3a50" stroke-width="3"/>
+            <rect x="234" y="6" width="12" height="6" rx="2" fill="#2a4e68"/>
+            <!-- Propeller -->
+            <circle cx="468" cy="80" r="14" fill="none" stroke="#1e3a50" stroke-width="2"/>
+            <line x1="468" y1="66" x2="468" y2="94" stroke="#1e3a50" stroke-width="2"/>
+            <line x1="454" y1="80" x2="482" y2="80" stroke="#1e3a50" stroke-width="2"/>
+            <!-- Windows -->
+            <circle cx="160" cy="80" r="8" fill="none" stroke="#2a4e68" stroke-width="1.5" opacity="0.6"/>
+            <circle cx="290" cy="80" r="8" fill="none" stroke="#2a4e68" stroke-width="1.5" opacity="0.6"/>
+            <!-- LEAK SPOTS -->
+            <g class="leak-spot" id="leak0" onclick="patchLeak(0)">
+              <circle cx="140" cy="100" r="10" fill="#3070c4" opacity="0.8"/>
+              <text x="140" y="105" text-anchor="middle" font-size="10" fill="white">💧</text>
+            </g>
+            <g class="leak-spot" id="leak1" onclick="patchLeak(1)">
+              <circle cx="310" cy="60" r="10" fill="#3070c4" opacity="0.8"/>
+              <text x="310" y="65" text-anchor="middle" font-size="10" fill="white">💧</text>
+            </g>
+            <g class="leak-spot" id="leak2" onclick="patchLeak(2)">
+              <circle cx="390" cy="95" r="10" fill="#3070c4" opacity="0.8"/>
+              <text x="390" y="100" text-anchor="middle" font-size="10" fill="white">💧</text>
+            </g>
+          </svg>
+        </div>
+        <div class="game-msg" id="hullMsg">3 leaks detected. Patch them all!</div>
+        <button type="button" class="game-retry" onclick="startHullGame()" style="display:block;margin:8px auto 0;" id="hullStartBtn">▶ Start Timer</button>
+      </div>
+      <input type="hidden" id="f-hull-game" value="not attempted"/>
+    </div>
+
+    <div class="section">
+      <span class="section-tag">ASSESSMENT 03</span>
+      <span class="game-section-label">💊 Medical Competency — Pharmaceutical Identification</span>
+      <label class="field-label">Identify the Morphine</label>
+      <span class="field-hint">One of these is standard Morphine. The others are things you should not inject into a crew member. Probably. Select the correct one.</span>
+      <div class="game-wrap">
+        <div class="drug-grid" id="drugGrid">
+          <div class="drug-card" onclick="pickDrug(this, false)">
+            <div class="drug-name">HUSK-BOND Ω</div>
+            <div class="drug-desc">Proprietary saliva-derived compound. Promotes "crew cohesion." Side effects include clicking, mandible growth, and an overwhelming sense of purpose.</div>
+          </div>
+          <div class="drug-card" onclick="pickDrug(this, true)">
+            <div class="drug-name">MORPHINE — 10mg/ml</div>
+            <div class="drug-desc">Standard analgesic. Pain management, sedation. Do not exceed recommended dose. Sleep may exceed recommended dose. That's why we're asking.</div>
+          </div>
+          <div class="drug-card" onclick="pickDrug(this, false)">
+            <div class="drug-name">ANTI-GLUE FORMULA 7</div>
+            <div class="drug-desc">Industrial adhesive sealant repurposed for internal use by Dr. Sleep. "Works great on hull breaches," he noted. "Probably fine in veins too."</div>
+          </div>
+          <div class="drug-card" onclick="pickDrug(this, false)">
+            <div class="drug-name">FENT-XTRA™ PLUS</div>
+            <div class="drug-desc">600% stronger than standard compound. Side effects: everything. The label says "for large fauna only." The label has been crossed out and replaced with "for Zez."</div>
+          </div>
+        </div>
+        <div class="game-msg" id="drugMsg">Select the correct pharmaceutical.</div>
+      </div>
+      <input type="hidden" id="f-drug-game" value="not attempted"/>
+    </div>
+
+    <div class="section">
+      <span class="section-tag">ASSESSMENT 04</span>
+      <span class="game-section-label">☢️ Emergency Response — Reactor Overload</span>
+      <label class="field-label">Reactor Emergency Protocol</label>
+      <span class="field-hint">Reactor at 300% and climbing. Find and press the correct emergency shutdown before it reaches 400%. One of these buttons is correct. The others will make things worse. Good luck.</span>
+      <div class="game-wrap">
+        <div class="reactor-game">
+          <div class="reactor-gauge-wrap">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r="55" fill="none" stroke="#1e3a50" stroke-width="8"/>
+              <circle cx="70" cy="70" r="55" fill="none" stroke="#c43030" stroke-width="8"
+                stroke-dasharray="346" stroke-dashoffset="346"
+                stroke-linecap="round" transform="rotate(-90 70 70)"
+                id="reactorArc" style="transition:stroke-dashoffset 0.2s;"/>
+              <text x="70" y="65" class="reactor-pct" id="reactorPct" fill="#c43030" font-family="Orbitron,sans-serif" font-size="18" font-weight="900" text-anchor="middle" dominant-baseline="central">300%</text>
+              <text x="70" y="88" text-anchor="middle" fill="#3a5a6e" font-size="9" font-family="Share Tech Mono,monospace">REACTOR OUTPUT</text>
+            </svg>
+          </div>
+          <div class="reactor-buttons" id="reactorButtons">
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,false)">BOOST COOLANT FLOW</button>
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,false)">INITIATE SEQUENCE B</button>
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,false)">VENT PLASMA ARRAY</button>
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,true)" id="scramBtn">SCRAM</button>
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,false)">CONFIRM OVERRIDE</button>
+            <button type="button" class="reactor-btn" onclick="reactorPress(this,false)">INCREASE OUTPUT</button>
+          </div>
+        </div>
+        <div class="game-msg" id="reactorMsg">⚠ Reactor output critical. Find the shutdown.</div>
+        <button type="button" class="game-retry" onclick="startReactor()" style="display:block;margin:8px auto 0;" id="reactorStartBtn">▶ Start Emergency</button>
+      </div>
+      <input type="hidden" id="f-reactor-game" value="not attempted"/>
+    </div>
+
+    <div class="section">
+      <span class="section-tag">ASSESSMENT 05</span>
+      <span class="game-section-label">🤡 Security Awareness — Threat Identification</span>
+      <label class="field-label">Spot the Clown</label>
+      <span class="field-hint">One of these crew members is not who they say they are. You have 10 seconds. Reindeer did this in 0.4 seconds. You are not Reindeer.</span>
+      <div class="game-wrap">
+        <div class="clown-timer"><div class="clown-timer-fill" id="clownTimerFill"></div></div>
+        <div class="crew-lineup" id="crewLineup"></div>
+        <div class="game-msg" id="clownMsg">Identify the clown before time runs out.</div>
+        <button type="button" class="game-retry" onclick="startClownGame()" style="display:block;margin:8px auto 0;" id="clownStartBtn">▶ Start</button>
+      </div>
+      <input type="hidden" id="f-clown-game" value="not attempted"/>
+    </div>
+
+        <!-- FIELD 15: Declarations -->
     <div class="section">
       <span class="section-tag">FIELD 15</span>
       <label class="field-label">Crew Declarations</label>
@@ -776,8 +992,13 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         afraid_of_heights: document.getElementById('f-heights').value,
         reactor_response:  document.getElementById('f-reactor').value,
         clown_response:    document.getElementById('f-clown-resp').value,
-        hull_response:     document.getElementById('f-hull').value,
+        hull_response:     (document.querySelector('input[name="hull"]:checked') || {value:''}).value,
         morphine_defense:  document.getElementById('f-morphine').value.trim(),
+        game_cables:       document.getElementById('f-cables').value,
+        game_hull:         document.getElementById('f-hull-game').value,
+        game_drug:         document.getElementById('f-drug-game').value,
+        game_reactor:      document.getElementById('f-reactor-game').value,
+        game_clown:        document.getElementById('f-clown-game').value,
         declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
         why_hire:          document.getElementById('f-whyhire').value.trim(),
         reactor_answer: (document.querySelector('input[name="reactor"]:checked') || {}).value || '',
@@ -786,8 +1007,13 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         afraid_of_heights: document.getElementById('f-heights').value,
         reactor_response:  document.getElementById('f-reactor').value,
         clown_response:    document.getElementById('f-clown-resp').value,
-        hull_response:     document.getElementById('f-hull').value,
+        hull_response:     (document.querySelector('input[name="hull"]:checked') || {value:''}).value,
         morphine_defense:  document.getElementById('f-morphine').value.trim(),
+        game_cables:       document.getElementById('f-cables').value,
+        game_hull:         document.getElementById('f-hull-game').value,
+        game_drug:         document.getElementById('f-drug-game').value,
+        game_reactor:      document.getElementById('f-reactor-game').value,
+        game_clown:        document.getElementById('f-clown-game').value,
         declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
         why_hire:          document.getElementById('f-whyhire').value.trim(),
         suggestions:   document.getElementById('f-suggestions').value.trim(),
@@ -828,6 +1054,306 @@ function setToggle(hiddenId, val, btnYesId, btnNoId) {
   document.getElementById(btnYesId).classList.toggle('yes-active', val === 'yes');
   document.getElementById(btnNoId).classList.toggle('no-active',  val === 'no');
 }
+
+// ═══════════ GAME 1: CABLES ═══════════
+let selectedLeft = null;
+let connections = {}; // leftColor -> rightColor
+
+function selectCablePort(el) {
+  if (el.classList.contains('connected')) return;
+  document.querySelectorAll('.left-port').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLeft = el;
+  document.getElementById('cableMsg').textContent = 'Now click the matching right port.';
+  document.getElementById('cableMsg').className = 'game-msg info';
+}
+
+function connectCablePort(el) {
+  if (!selectedLeft) { document.getElementById('cableMsg').textContent = 'Select a left port first.'; return; }
+  const lColor = selectedLeft.dataset.color;
+  const rColor = el.dataset.color;
+  connections[lColor] = rColor;
+  drawCableLines();
+  selectedLeft.classList.remove('selected');
+  selectedLeft = null;
+  checkCables();
+}
+
+function drawCableLines() {
+  const canvas = document.getElementById('cableCanvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const colorMap = {red:'#c43030',blue:'#3070c4',green:'#4caf72',yellow:'#d4a843'};
+  const leftPorts = document.querySelectorAll('.left-port');
+  const rightPorts = document.querySelectorAll('.right-port');
+
+  Object.entries(connections).forEach(([lColor, rColor]) => {
+    let lEl = null, rEl = null;
+    leftPorts.forEach(p => { if (p.dataset.color === lColor) lEl = p; });
+    rightPorts.forEach(p => { if (p.dataset.color === rColor) rEl = p; });
+    if (!lEl || !rEl) return;
+
+    const lRect = lEl.querySelector('.port-dot').getBoundingClientRect();
+    const rRect = rEl.querySelector('.port-dot').getBoundingClientRect();
+    const cRect = canvas.getBoundingClientRect();
+
+    const x1 = lRect.left + lRect.width/2 - cRect.left;
+    const y1 = lRect.top  + lRect.height/2 - cRect.top;
+    const x2 = rRect.left + rRect.width/2 - cRect.left;
+    const y2 = rRect.top  + rRect.height/2 - cRect.top;
+
+    const correct = lColor === rColor;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.bezierCurveTo(x1 + (x2-x1)*0.4, y1, x1 + (x2-x1)*0.6, y2, x2, y2);
+    ctx.strokeStyle = correct ? colorMap[lColor] : '#c43030';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = correct ? colorMap[lColor] : '#c43030';
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+  });
+}
+
+function checkCables() {
+  const colors = ['red','blue','green','yellow'];
+  const allConnected = colors.every(c => connections[c]);
+  const allCorrect = colors.every(c => connections[c] === c);
+  if (!allConnected) {
+    const done = Object.keys(connections).length;
+    document.getElementById('cableMsg').textContent = done + '/4 connected.';
+    document.getElementById('cableMsg').className = 'game-msg info';
+    return;
+  }
+  if (allCorrect) {
+    document.getElementById('cableMsg').textContent = '✔ ALL CABLES CORRECT — POWER RESTORED';
+    document.getElementById('cableMsg').className = 'game-msg pass';
+    document.getElementById('f-cables').value = 'PASSED';
+  } else {
+    const correct = colors.filter(c => connections[c] === c).length;
+    document.getElementById('cableMsg').textContent = correct + '/4 correct. Wrong connections shown in red.';
+    document.getElementById('cableMsg').className = 'game-msg fail';
+    document.getElementById('f-cables').value = 'FAILED — ' + correct + '/4 correct';
+  }
+}
+
+function resetCables() {
+  connections = {}; selectedLeft = null;
+  const canvas = document.getElementById('cableCanvas');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  document.querySelectorAll('.cable-port').forEach(p => p.classList.remove('selected','connected'));
+  document.getElementById('cableMsg').textContent = 'Select a left port to begin.';
+  document.getElementById('cableMsg').className = 'game-msg';
+  document.getElementById('f-cables').value = 'not attempted';
+}
+window.addEventListener('resize', drawCableLines);
+
+// ═══════════ GAME 2: HULL REPAIR ═══════════
+let hullPatched = [false,false,false];
+let hullTimer = null;
+let hullTime = 20;
+
+function startHullGame() {
+  hullPatched = [false,false,false];
+  hullTime = 20;
+  document.getElementById('hullStartBtn').style.display = 'none';
+  document.querySelectorAll('.leak-spot').forEach(l => { l.classList.remove('patched'); l.style.display=''; });
+  document.getElementById('hullMsg').textContent = '3 leaks detected. Patch them all!';
+  document.getElementById('hullMsg').className = 'game-msg info';
+  document.getElementById('f-hull-game').value = 'in progress';
+  document.getElementById('hullTimerFill').style.width = '100%';
+  document.getElementById('hullTimerFill').style.background = 'var(--success)';
+  clearInterval(hullTimer);
+  hullTimer = setInterval(() => {
+    hullTime -= 0.1;
+    const pct = (hullTime / 20) * 100;
+    document.getElementById('hullTimerFill').style.width = pct + '%';
+    if (pct < 40) document.getElementById('hullTimerFill').style.background = 'var(--warn)';
+    if (pct < 20) document.getElementById('hullTimerFill').style.background = 'var(--danger2)';
+    if (hullTime <= 0) {
+      clearInterval(hullTimer);
+      const fixed = hullPatched.filter(Boolean).length;
+      document.getElementById('hullMsg').textContent = '✘ TIME UP — ' + fixed + '/3 patched. The submarine is now wetter.';
+      document.getElementById('hullMsg').className = 'game-msg fail';
+      document.getElementById('f-hull-game').value = 'FAILED — ' + fixed + '/3 patched';
+      document.getElementById('hullStartBtn').style.display = 'block';
+      document.getElementById('hullStartBtn').textContent = '↺ Try Again';
+    }
+  }, 100);
+}
+
+function patchLeak(idx) {
+  if (hullTimer === null || hullTime <= 0) return;
+  if (hullPatched[idx]) return;
+  hullPatched[idx] = true;
+  const spot = document.getElementById('leak' + idx);
+  spot.classList.add('patched');
+  spot.querySelector('circle').setAttribute('fill', '#4caf72');
+  spot.querySelector('text').textContent = '✔';
+  const done = hullPatched.filter(Boolean).length;
+  if (done === 3) {
+    clearInterval(hullTimer);
+    const timeLeft = Math.round(hullTime * 10) / 10;
+    document.getElementById('hullMsg').textContent = '✔ ALL LEAKS PATCHED — ' + timeLeft.toFixed(1) + 's remaining. Jager would be almost impressed.';
+    document.getElementById('hullMsg').className = 'game-msg pass';
+    document.getElementById('f-hull-game').value = 'PASSED — ' + timeLeft.toFixed(1) + 's remaining';
+    document.getElementById('hullStartBtn').style.display = 'none';
+  } else {
+    document.getElementById('hullMsg').textContent = done + '/3 patched. Keep going!';
+  }
+}
+
+// ═══════════ GAME 3: DRUG ID ═══════════
+function pickDrug(el, correct) {
+  if (document.querySelector('.drug-card.selected-right')) return; // already won
+  if (correct) {
+    el.classList.add('selected-right');
+    document.getElementById('drugMsg').textContent = '✔ CORRECT — That is Morphine. Please use responsibly. Or don't. Sleep didn't.';
+    document.getElementById('drugMsg').className = 'game-msg pass';
+    document.getElementById('f-drug-game').value = 'PASSED';
+    document.querySelectorAll('.drug-card').forEach(c => c.style.pointerEvents = 'none');
+  } else {
+    el.classList.add('selected-wrong');
+    document.getElementById('drugMsg').textContent = '✘ INCORRECT. That is not Morphine. Do not inject that into anyone.';
+    document.getElementById('drugMsg').className = 'game-msg fail';
+    document.getElementById('f-drug-game').value = 'FAILED';
+    setTimeout(() => el.classList.remove('selected-wrong'), 600);
+  }
+}
+
+// ═══════════ GAME 4: REACTOR ═══════════
+let reactorPct = 300;
+let reactorInterval = null;
+let reactorActive = false;
+
+function startReactor() {
+  reactorPct = 300;
+  reactorActive = true;
+  document.getElementById('reactorStartBtn').style.display = 'none';
+  document.querySelectorAll('.reactor-btn').forEach(b => { b.classList.remove('wrong-btn','right-btn'); b.disabled = false; });
+  document.getElementById('reactorMsg').textContent = '⚠ Reactor output critical. Find the shutdown.';
+  document.getElementById('reactorMsg').className = 'game-msg fail';
+  document.getElementById('f-reactor-game').value = 'in progress';
+  clearInterval(reactorInterval);
+  reactorInterval = setInterval(() => {
+    reactorPct += 2;
+    updateReactorGauge();
+    if (reactorPct >= 400) {
+      clearInterval(reactorInterval); reactorActive = false;
+      document.getElementById('reactorMsg').textContent = '☢ MELTDOWN — Reactor at 400%. The submarine is now a very small sun.';
+      document.getElementById('reactorMsg').className = 'game-msg fail';
+      document.getElementById('f-reactor-game').value = 'FAILED — MELTDOWN';
+      document.getElementById('reactorStartBtn').style.display = 'block';
+      document.getElementById('reactorStartBtn').textContent = '↺ Try Again';
+    }
+  }, 300);
+}
+
+function updateReactorGauge() {
+  const pct = Math.min(reactorPct, 400);
+  const ratio = (pct - 300) / 100; // 0 to 1
+  const circumference = 2 * Math.PI * 55;
+  const offset = circumference - (circumference * ratio);
+  document.getElementById('reactorArc').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('reactorPct').textContent = Math.round(pct) + '%';
+  const color = ratio > 0.7 ? '#ff2020' : ratio > 0.4 ? '#c43030' : '#d4a843';
+  document.getElementById('reactorArc').setAttribute('stroke', color);
+  document.getElementById('reactorPct').setAttribute('fill', color);
+}
+
+function reactorPress(btn, correct) {
+  if (!reactorActive) return;
+  if (correct) {
+    clearInterval(reactorInterval); reactorActive = false;
+    btn.classList.add('right-btn');
+    document.getElementById('reactorMsg').textContent = '✔ SCRAM ACTIVATED — Reactor shutdown. Good find. Jager is silently relieved.';
+    document.getElementById('reactorMsg').className = 'game-msg pass';
+    document.getElementById('f-reactor-game').value = 'PASSED — ' + Math.round(reactorPct) + '%';
+    document.getElementById('reactorStartBtn').style.display = 'none';
+  } else {
+    btn.classList.add('wrong-btn');
+    reactorPct += 15;
+    updateReactorGauge();
+    document.getElementById('reactorMsg').textContent = '✘ Wrong button! Output jumped to ' + Math.round(reactorPct) + '%.';
+    setTimeout(() => btn.classList.remove('wrong-btn'), 500);
+  }
+}
+
+// ═══════════ GAME 5: SPOT THE CLOWN ═══════════
+const crewMembers = [
+  {name:'Vasquez', avatar:'👷'},
+  {name:'Petrov',  avatar:'🧑‍🔧'},
+  {name:'Okafor',  avatar:'👨‍✈️'},
+  {name:'Lindqvist',avatar:'🧑‍🔬'},
+  {name:'Honksworth',avatar:'🤡', isClown:true},
+  {name:'Torres',  avatar:'🛡️'},
+];
+let clownTimer = null;
+let clownTime = 10;
+let clownStarted = false;
+let clownDone = false;
+
+function startClownGame() {
+  clownDone = false; clownTime = 10; clownStarted = true;
+  document.getElementById('clownStartBtn').style.display = 'none';
+  document.getElementById('f-clown-game').value = 'in progress';
+  document.getElementById('clownTimerFill').style.width = '100%';
+  document.getElementById('clownTimerFill').style.background = 'var(--danger2)';
+
+  // Shuffle crew
+  const shuffled = [...crewMembers].sort(() => Math.random() - 0.5);
+  const lineup = document.getElementById('crewLineup');
+  lineup.innerHTML = '';
+  shuffled.forEach((member, i) => {
+    const el = document.createElement('div');
+    el.className = 'crew-member' + (member.isClown ? ' is-clown' : '');
+    el.innerHTML = '<span class="crew-avatar">' + member.avatar + '</span><span class="crew-name">' + member.name + '</span>';
+    el.addEventListener('click', () => pickCrewMember(el, member.isClown));
+    lineup.appendChild(el);
+  });
+
+  document.getElementById('clownMsg').textContent = 'Find the clown!';
+  document.getElementById('clownMsg').className = 'game-msg info';
+  clearInterval(clownTimer);
+  clownTimer = setInterval(() => {
+    clownTime -= 0.1;
+    const pct = (clownTime / 10) * 100;
+    document.getElementById('clownTimerFill').style.width = pct + '%';
+    if (clownTime <= 0 && !clownDone) {
+      clearInterval(clownTimer); clownDone = true;
+      document.getElementById('clownMsg').textContent = '✘ TIME UP — The clown escaped. Reindeer is disappointed in you.';
+      document.getElementById('clownMsg').className = 'game-msg fail';
+      document.getElementById('f-clown-game').value = 'FAILED — timed out';
+      document.getElementById('clownStartBtn').style.display = 'block';
+      document.getElementById('clownStartBtn').textContent = '↺ Try Again';
+      // Reveal the clown
+      document.querySelectorAll('.is-clown').forEach(el => el.style.outline = '2px solid var(--danger2)');
+    }
+  }, 100);
+}
+
+function pickCrewMember(el, isClown) {
+  if (!clownStarted || clownDone) return;
+  if (isClown) {
+    clearInterval(clownTimer); clownDone = true;
+    el.classList.add('right-pick');
+    const timeLeft = clownTime.toFixed(1);
+    document.getElementById('clownMsg').textContent = '✔ CLOWN IDENTIFIED — ' + timeLeft + 's remaining. Reindeer has already opened fire.';
+    document.getElementById('clownMsg').className = 'game-msg pass';
+    document.getElementById('f-clown-game').value = 'PASSED — ' + timeLeft + 's remaining';
+    document.getElementById('clownStartBtn').style.display = 'none';
+    document.querySelectorAll('.crew-member').forEach(m => m.style.pointerEvents = 'none');
+  } else {
+    el.classList.add('wrong-pick');
+    clownTime -= 2;
+    document.getElementById('clownMsg').textContent = '✘ Not a clown! -2 seconds.';
+    setTimeout(() => el.classList.remove('wrong-pick'), 400);
+  }
+}
+
 </script>
 </body>
 </html>
