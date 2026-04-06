@@ -460,99 +460,62 @@ If you are reading this notice and still considering applying — welcome. You'r
       <input type="hidden" id="f-heights" value=""/>
     </div>
 
-    <!-- FIELD 13: Why hire you -->
-
+        <!-- FIELD 13: Hull leak -->
     <div class="section">
       <span class="section-tag">FIELD 13</span>
-      <label class="field-label" for="f-whyhire">Why Should I Hire You?</label>
-      <span class="field-hint">Make your case. Bribery, flattery, and threats are all considered.</span>
-      <textarea id="f-whyhire" placeholder="Convince command. You have one chance."></textarea>
+      <label class="field-label">You see the hull leaking water. What do you do?</label>
+      <span class="field-hint">We are at 2,000 meters. Please consider your answer carefully.</span>
+      <div class="mcq-grid">
+        <div class="mcq-btn" data-group="hull" data-val="A - Put a bucket below">A) &nbsp;Put a bucket below the leak</div>
+        <div class="mcq-btn" data-group="hull" data-val="B - Call for Engineer">B) &nbsp;Call for Engineer</div>
+        <div class="mcq-btn" data-group="hull" data-val="C - Stuff it with a towel">C) &nbsp;Stuff it with a towel</div>
+        <div class="mcq-btn" data-group="hull" data-val="D - Ignore it">D) &nbsp;Ignore it — it's just a small leak</div>
+      </div>
+      <input type="hidden" id="f-hull" value=""/>
     </div>
 
-    <!-- FIELD 11: Open suggestions -->
+<!-- FIELD 14: Morphine defense -->
     <div class="section">
       <span class="section-tag">FIELD 14</span>
-      <label class="field-label" for="f-suggestions">Open Suggestions</label>
-      <span class="field-hint">Anything else command should know. Grievances, requests, or threats.</span>
-      <textarea id="f-suggestions" placeholder="Optional. This field is monitored."></textarea>
-    </div>
-
-    <!-- FIELD 12: Reactor -->
-    <div class="section">
-      <span class="section-tag">FIELD 12</span>
-      <label class="field-label">You see the reactor at 300% power and rising. What do you do?</label>
-      <span class="field-hint">Choose carefully. There is a correct answer. There is also a very wrong answer.</span>
-      <div class="mcq-grid" id="reactor-grid">
-        <div class="mcq-option" data-group="reactor" data-val="A) Turn it off">
-          <span class="mcq-letter">A</span>
-          <span class="mcq-text">Turn it off</span>
-        </div>
-        <div class="mcq-option" data-group="reactor" data-val="B) Blame the assistant">
-          <span class="mcq-letter">B</span>
-          <span class="mcq-text">Blame the assistant</span>
-        </div>
-        <div class="mcq-option" data-group="reactor" data-val="C) Increase it to 400% for science">
-          <span class="mcq-letter">C</span>
-          <span class="mcq-text">Increase it to 400% for science</span>
-        </div>
-        <div class="mcq-option" data-group="reactor" data-val="D) Say nothing, it is the Electrician's duty">
-          <span class="mcq-letter">D</span>
-          <span class="mcq-text">Say nothing — it's the Electrician's duty</span>
-        </div>
-      </div>
-      <input type="hidden" id="f-reactor" value=""/>
-      <span class="err-msg" id="e-reactor">Command requires an answer. Any answer.</span>
-    </div>
-
-    <!-- FIELD 13: Clown -->
-    <div class="section">
-      <span class="section-tag">FIELD 13</span>
-      <label class="field-label">A clown is honking at you. Your response?</label>
-      <span class="field-hint">Your answer will be shared with the Clown Mother. Probably.</span>
-      <div class="mcq-grid" id="clown-grid">
-        <div class="mcq-option" data-group="clown" data-val="A) Beat him up">
-          <span class="mcq-letter">A</span>
-          <span class="mcq-text">Beat him up</span>
-        </div>
-        <div class="mcq-option" data-group="clown" data-val="B) Kindly ask him to stop honking">
-          <span class="mcq-letter">B</span>
-          <span class="mcq-text">Kindly ask him to stop honking</span>
-        </div>
-        <div class="mcq-option" data-group="clown" data-val="C) Call for Security">
-          <span class="mcq-letter">C</span>
-          <span class="mcq-text">Call for Security</span>
-        </div>
-        <div class="mcq-option" data-group="clown" data-val="D) Honk back louder">
-          <span class="mcq-letter">D</span>
-          <span class="mcq-text">Honk back louder</span>
-        </div>
-      </div>
-      <input type="hidden" id="f-clown-q" value=""/>
-      <span class="err-msg" id="e-clown-q">This is not optional. The clown is still honking.</span>
-    </div>
-
-    <!-- FIELD 14: Heights -->
-    <div class="section">
-      <span class="section-tag">FIELD 14</span>
-      <label class="field-label">Are you afraid of heights?</label>
-      <span class="field-hint">We are operating at the bottom of an ocean on an ice moon. Asking for a friend.</span>
-      <div class="clown-row">
-        <button type="button" class="clown-btn" id="btn-heights-no"  onclick="setHeights('No')">✅ &nbsp;No</button>
-        <button type="button" class="clown-btn" id="btn-heights-yes" onclick="setHeights('Yes')">😰 &nbsp;Yes</button>
-      </div>
-      <input type="hidden" id="f-heights" value=""/>
-      <span class="err-msg" id="e-heights">Please answer. It will not affect your application. Much.</span>
-    </div>
-
-    <!-- FIELD 15: Morphine defense -->
-    <div class="section">
-      <span class="section-tag">FIELD 15</span>
       <label class="field-label" for="f-morphine">You have been accused of stealing Morphine from the medical room. Defend yourself.</label>
       <span class="field-hint">Your response will be reviewed by the Chief Medical Officer. Who is also the one accusing you.</span>
       <textarea id="f-morphine" placeholder="I can explain. Actually, I cannot explain. But here is what happened..."></textarea>
     </div>
 
-    <div class="submit-zone">
+    <!-- FIELD 15: Declarations -->
+    <div class="section">
+      <span class="section-tag">FIELD 15</span>
+      <label class="field-label">Crew Declarations</label>
+      <span class="field-hint">Tick all that apply. Or lie. We'll find out either way.</span>
+      <div class="declarations-grid">
+        <label class="decl-item"><input type="checkbox" name="decl" value="no_reactor"/><span class="avail-box">✔</span><span class="avail-label">I will not touch the reactor &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">(I probably will if the Electrician falls asleep)</span></span></label>
+        <label class="decl-item"><input type="checkbox" name="decl" value="oxygen"/><span class="avail-box">✔</span><span class="avail-label">I understand that oxygen is important for the submarine's functionality</span></label>
+        <label class="decl-item"><input type="checkbox" name="decl" value="swim"/><span class="avail-box">✔</span><span class="avail-label">I know how to swim</span></label>
+        <label class="decl-item"><input type="checkbox" name="decl" value="tanks"/><span class="avail-box">✔</span><span class="avail-label">I can tell apart an oxygen tank and a plasma tank</span></label>
+        <label class="decl-item"><input type="checkbox" name="decl" value="secrecy"/><span class="avail-box">✔</span><span class="avail-label">Whatever happens on the submarine stays between the crew &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">;) ;)</span></span></label>
+        <label class="decl-item"><input type="checkbox" name="decl" value="organs"/><span class="avail-box">✔</span><span class="avail-label">I accept death as a learning experience and donate my organs if I perish</span></label>
+      </div>
+    </div>
+
+<!-- FIELD 16: Why hire you -->
+
+    <div class="section">
+      <span class="section-tag">FIELD 16</span>
+      <label class="field-label" for="f-whyhire">Why Should I Hire You?</label>
+      <span class="field-hint">Make your case. Bribery, flattery, and threats are all considered.</span>
+      <textarea id="f-whyhire" placeholder="Convince command. You have one chance."></textarea>
+    </div>
+
+    <!-- FIELD 17: Open suggestions -->
+    <div class="section">
+      <span class="section-tag">FIELD 17</span>
+      <label class="field-label" for="f-suggestions">Open Suggestions</label>
+      <span class="field-hint">Anything else command should know. Grievances, requests, or threats.</span>
+      <textarea id="f-suggestions" placeholder="Optional. This field is monitored."></textarea>
+    </div>
+
+    
+        <div class="submit-zone">
       <button type="submit" class="submit-btn" id="submitBtn">SUBMIT APPLICATION</button>
       <p class="submit-note">// Transmission encrypted — EuropaNet relay — All data logged //</p>
     </div>
