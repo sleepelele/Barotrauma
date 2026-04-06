@@ -275,8 +275,10 @@
     .yn-row { display:flex; gap:10px; }
     .yn-btn { flex:1; padding:12px; border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:'Orbitron',sans-serif; font-size:0.72rem; letter-spacing:0.14em; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
     .yn-btn:hover { border-color:var(--border2); color:var(--text); }
-    .yn-btn.yn-yes { border-color:var(--danger2); color:var(--danger2); background:rgba(122,32,32,0.12); box-shadow:0 0 10px rgba(196,48,48,0.2); }
-    .yn-btn.yn-no  { border-color:var(--success); color:var(--success); background:rgba(106,170,58,0.08); box-shadow:0 0 10px rgba(106,170,58,0.2); }
+    .yn-btn.yn-yes { border-color:var(--danger2); color:var(--danger2); background:rgba(122,32,32,0.12); }
+    .yn-btn.yn-no  { border-color:var(--success); color:var(--success); background:rgba(106,170,58,0.08); }
+    .yn-btn.yn-active-yes { border-color:var(--danger2)!important; color:var(--danger2)!important; background:rgba(122,32,32,0.2)!important; box-shadow:0 0 14px rgba(196,48,48,0.4)!important; }
+    .yn-btn.yn-active-no  { border-color:var(--success)!important; color:var(--success)!important; background:rgba(106,170,58,0.14)!important; box-shadow:0 0 14px rgba(106,170,58,0.35)!important; }
   
     /* MCQ options */
     .mcq-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px; }
@@ -802,6 +804,12 @@ document.querySelectorAll('.mcq-grid').forEach(grid => {
 function setHeights(v) {
   document.getElementById('f-heights').value = v;
   document.getElementById('yn-yes').classList.toggle('yn-yes', v === 'Yes');
+  document.getElementById('yn-no').classList.toggle('yn-no', v === 'No');
+  document.getElementById('yn-yes').classList.toggle('yn-active-yes', v === 'Yes');
+  document.getElementById('yn-no').classList.toggle('yn-active-no', v === 'No');
+  const err = document.getElementById('e-heights');
+  if (err) err.classList.remove('show');
+  document.getElementById('yn-yes').classList.toggle('yn-yes', v === 'Yes');
   document.getElementById('yn-no').classList.toggle('yn-no',  v === 'No');
   // reset the other
   if (v === 'Yes') document.getElementById('yn-no').classList.remove('yn-no');
@@ -866,12 +874,6 @@ function setupMCQ(gridId, hiddenId) {
 setupMCQ('reactor-grid', 'f-reactor');
 setupMCQ('clown-grid',   'f-clown-q');
 
-function setHeights(v) {
-  document.getElementById('f-heights').value = v;
-  document.getElementById('btn-heights-no').classList.toggle('no-active',  v === 'No');
-  document.getElementById('btn-heights-yes').classList.toggle('yes-active', v === 'Yes');
-  document.getElementById('e-heights').classList.remove('show');
-}
 
 // ═══════════ SUPABASE ═══════════
 const SUPA_URL = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
@@ -880,52 +882,67 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 document.getElementById('appForm').addEventListener('submit', async e => {
   e.preventDefault();
   let valid = true;
+  const missing = [];
 
   const name  = document.getElementById('f-name').value.trim();
   const age   = document.getElementById('f-age').value;
   const clown = document.getElementById('f-clown').value;
-
-  const check = (id, errId, bad) => {
-    document.getElementById(id).classList.toggle('err', bad);
-    document.getElementById(errId).classList.toggle('show', bad);
-    if (bad) valid = false;
-  };
-
-  check('f-name', 'e-name', !name);
-  check('f-age',  'e-age',  !age || age < 16 || age > 99);
-
-  // Role ranking — require at least 3
-  if (roleRanking.length < 3) {
-    document.getElementById('e-role').classList.add('show'); valid = false;
-  } else {
-    document.getElementById('e-role').classList.remove('show');
-  }
-
-  if (!clown) { document.getElementById('e-clown').classList.add('show'); valid = false; }
-  else        { document.getElementById('e-clown').classList.remove('show'); }
-
-  const reactor = document.getElementById('f-reactor').value;
-  if (!reactor) { document.getElementById('e-reactor').classList.add('show'); valid = false; }
-  else          { document.getElementById('e-reactor').classList.remove('show'); }
-
-  const clownQ = document.getElementById('f-clown-q').value;
-  if (!clownQ) { document.getElementById('e-clown-q').classList.add('show'); valid = false; }
-  else         { document.getElementById('e-clown-q').classList.remove('show'); }
-
+  const reactor = (document.querySelector('input[name="reactor"]:checked') || {}).value || '';
+  const clownQ  = (document.querySelector('input[name="clown-resp"]:checked') || {}).value || '';
+  const hullQ   = (document.querySelector('input[name="hull"]:checked') || {}).value || '';
   const heights = document.getElementById('f-heights').value;
-  if (!heights) { document.getElementById('e-heights').classList.add('show'); valid = false; }
-  else          { document.getElementById('e-heights').classList.remove('show'); }
-
-  // All 6 declarations must be checked
   const declChecked = document.querySelectorAll('input[name="decl"]:checked').length;
-  if (declChecked < 6) {
-    document.getElementById('e-decl').classList.add('show');
+
+  // Helper: mark field invalid and record missing label
+  function fail(inputId, errId, label) {
+    const el = document.getElementById(inputId);
+    const err = document.getElementById(errId);
+    if (el)  el.classList.add('err');
+    if (err) err.classList.add('show');
+    missing.push(label);
     valid = false;
-  } else {
-    document.getElementById('e-decl').classList.remove('show');
+  }
+  function pass(inputId, errId) {
+    const el = document.getElementById(inputId);
+    const err = document.getElementById(errId);
+    if (el)  el.classList.remove('err');
+    if (err) err.classList.remove('show');
   }
 
-  if (!valid) return;
+  // Validate each field
+  if (!name)                  fail('f-name',  'e-name',  'Name / Surname');
+  else                        pass('f-name',  'e-name');
+
+  if (!age || age<16||age>99) fail('f-age',   'e-age',   'Age');
+  else                        pass('f-age',   'e-age');
+
+  if (roleRanking.length < 3) { document.getElementById('e-role').classList.add('show');    missing.push('Role Ranking (min 3)'); valid = false; }
+  else                          document.getElementById('e-role').classList.remove('show');
+
+  if (!clown)  { document.getElementById('e-clown').classList.add('show');   missing.push('Clown Mother history'); valid = false; }
+  else           document.getElementById('e-clown').classList.remove('show');
+
+  if (!reactor) { document.getElementById('e-reactor') && document.getElementById('e-reactor').classList.add('show');   missing.push('Reactor response'); valid = false; }
+  else          { document.getElementById('e-reactor') && document.getElementById('e-reactor').classList.remove('show'); }
+
+  if (!clownQ)  { document.getElementById('e-clown-q') && document.getElementById('e-clown-q').classList.add('show');   missing.push('Clown response'); valid = false; }
+  else          { document.getElementById('e-clown-q') && document.getElementById('e-clown-q').classList.remove('show'); }
+
+  if (!heights) { document.getElementById('e-heights') && document.getElementById('e-heights').classList.add('show');   missing.push('Heights question'); valid = false; }
+  else          { document.getElementById('e-heights') && document.getElementById('e-heights').classList.remove('show'); }
+
+  if (declChecked < 6) { document.getElementById('e-decl').classList.add('show');   missing.push('All 6 Crew Declarations'); valid = false; }
+  else                   document.getElementById('e-decl').classList.remove('show');
+
+  if (!valid) {
+    // Scroll to first error
+    const firstErr = document.querySelector('.err, .err-msg.show');
+    if (firstErr) firstErr.scrollIntoView({ behavior:'smooth', block:'center' });
+
+    // Show popup
+    showMissingPopup(missing);
+    return;
+  }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'TRANSMITTING...';
@@ -937,52 +954,33 @@ document.getElementById('appForm').addEventListener('submit', async e => {
       body: JSON.stringify({
         name, age: parseInt(age),
         role: roleRanking[0] || '',
-        role_ranking: roleRanking.map((r,i) => `${i+1}. ${r}`).join(', '),
-        experience:   document.getElementById('f-exp').value.trim(),
-        likes:        document.getElementById('f-drug').value.trim(),
-        dislikes:     document.getElementById('f-dislikes').value.trim(),
+        role_ranking: roleRanking.map((r,i)=>`${i+1}. ${r}`).join(', '),
+        experience:    document.getElementById('f-exp').value.trim(),
+        likes:         document.getElementById('f-drug').value.trim(),
+        dislikes:      document.getElementById('f-dislikes').value.trim(),
         clown_history: clown,
         availability:  getAvailability(),
         salary_pct:    parseInt(document.getElementById('f-salary').value),
-        afraid_of_heights: document.getElementById('f-heights').value,
-        reactor_response:  document.getElementById('f-reactor').value,
-        clown_response:    document.getElementById('f-clown-resp').value,
-        hull_response:     (document.querySelector('input[name="hull"]:checked') || {value:''}).value,
+        afraid_of_heights: heights,
+        reactor_response:  reactor,
+        clown_response:    clownQ,
+        hull_response:     hullQ,
         morphine_defense:  document.getElementById('f-morphine').value.trim(),
         game_cables:       document.getElementById('f-cables').value,
-        game_hull:         document.getElementById('f-hull-game').value,
         game_drug:         document.getElementById('f-drug-game').value,
         game_reactor:      document.getElementById('f-reactor-game').value,
         game_clown:        document.getElementById('f-clown-game').value,
         declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
         why_hire:          document.getElementById('f-whyhire').value.trim(),
-        reactor_answer: (document.querySelector('input[name="reactor"]:checked') || {}).value || '',
-        clown_answer:   (document.querySelector('input[name="clown_response"]:checked') || {}).value || '',
-        afraid_heights: document.getElementById('f-heights').value,
-        afraid_of_heights: document.getElementById('f-heights').value,
-        reactor_response:  document.getElementById('f-reactor').value,
-        clown_response:    document.getElementById('f-clown-resp').value,
-        hull_response:     (document.querySelector('input[name="hull"]:checked') || {value:''}).value,
-        morphine_defense:  document.getElementById('f-morphine').value.trim(),
-        game_cables:       document.getElementById('f-cables').value,
-        game_hull:         document.getElementById('f-hull-game').value,
-        game_drug:         document.getElementById('f-drug-game').value,
-        game_reactor:      document.getElementById('f-reactor-game').value,
-        game_clown:        document.getElementById('f-clown-game').value,
-        declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
-        why_hire:          document.getElementById('f-whyhire').value.trim(),
-        suggestions:   document.getElementById('f-suggestions').value.trim(),
-        reactor_response: document.getElementById('f-reactor').value,
-        clown_response:   document.getElementById('f-clown-q').value,
-        afraid_of_heights: document.getElementById('f-heights').value,
-        morphine_defense:  document.getElementById('f-morphine').value.trim(),
-        submitted_at:  new Date().toISOString()
+        suggestions:       document.getElementById('f-suggestions').value.trim(),
+        submitted_at:      new Date().toISOString()
       })
     });
     if (!res.ok) throw new Error(await res.text());
     document.getElementById('appForm').style.display = 'none';
     document.getElementById('successScreen').classList.add('show');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('successScreen').style.display = 'block';
+    window.scrollTo({ top:0, behavior:'smooth' });
   } catch(err) {
     console.error(err);
     btn.textContent = 'SUBMIT APPLICATION'; btn.disabled = false;
@@ -990,258 +988,37 @@ document.getElementById('appForm').addEventListener('submit', async e => {
   }
 });
 
-// ═══════════ MCQ BUTTONS ═══════════
-document.querySelectorAll('.mcq-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const group = btn.dataset.group;
-    document.querySelectorAll(`.mcq-btn[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    // find hidden input by group name mapping
-    const map = {'reactor':'f-reactor','clown-resp':'f-clown-resp','hull':'f-hull'};
-    const inputId = map[group];
-    if (inputId) document.getElementById(inputId).value = btn.dataset.val;
-  });
-});
+function showMissingPopup(fields) {
+  // Remove existing popup
+  const old = document.getElementById('missingPopup');
+  if (old) old.remove();
 
-// ═══════════ YES/NO TOGGLE ═══════════
-function setToggle(hiddenId, val, btnYesId, btnNoId) {
-  document.getElementById(hiddenId).value = val;
-  document.getElementById(btnYesId).classList.toggle('yes-active', val === 'yes');
-  document.getElementById(btnNoId).classList.toggle('no-active',  val === 'no');
+  const popup = document.createElement('div');
+  popup.id = 'missingPopup';
+  popup.style.cssText = `
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:9999; background:#0d1e2e; border:2px solid #c43030;
+    padding:28px 32px; max-width:420px; width:90%;
+    box-shadow:0 0 40px rgba(196,48,48,0.4), 0 0 0 9999px rgba(0,0,0,0.6);
+    font-family:'Share Tech Mono',monospace;
+    animation:fadeIn 0.2s ease;
+  `;
+  popup.innerHTML = `
+    <div style="color:#c43030;font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:0.18em;margin-bottom:14px;">⚠ TRANSMISSION BLOCKED</div>
+    <div style="color:#7a9db0;font-size:0.74rem;line-height:1.8;margin-bottom:16px;">The following mandatory fields are incomplete:</div>
+    <ul style="list-style:none;padding:0;margin:0 0 20px 0;">
+      ${fields.map(f=>`<li style="color:#a8c4d4;font-size:0.74rem;padding:4px 0;border-bottom:1px solid #1e3a50;">▸ ${f}</li>`).join('')}
+    </ul>
+    <div style="color:#3a5a6e;font-size:0.68rem;margin-bottom:16px;font-style:italic;">All fields marked are required for crew consideration. No exceptions. Not even for you.</div>
+    <button onclick="document.getElementById('missingPopup').remove()" style="
+      font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:700;
+      letter-spacing:0.18em;color:#0d1e2e;background:#c43030;border:none;
+      padding:10px 24px;cursor:pointer;width:100%;text-transform:uppercase;
+    ">ACKNOWLEDGE & CORRECT</button>
+  `;
+  document.body.appendChild(popup);
+
+  // Close on backdrop click
+  popup.addEventListener('click', e => { if (e.target === popup) popup.remove(); });
 }
-
-
-// ═══════════════════════════════════════════
-// GAMES — init after DOM ready
-// ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', function() {
-
-  // ── GAME 1: CABLE CONNECT ──
-  let selLeft = null;
-  const cxns  = {}; // leftColor -> rightColor
-
-  function colorHex(c) {
-    return {red:'#c43030',blue:'#3070c4',green:'#4caf72',yellow:'#d4a843'}[c] || '#888';
-  }
-
-  document.querySelectorAll('.left-port').forEach(p => {
-    p.addEventListener('click', function() {
-      if (this.classList.contains('connected')) return;
-      document.querySelectorAll('.left-port').forEach(x => x.classList.remove('selected'));
-      this.classList.add('selected');
-      selLeft = this;
-      setMsg('cableMsg','Click the matching right port.','info');
-    });
-  });
-
-  document.querySelectorAll('.right-port').forEach(p => {
-    p.addEventListener('click', function() {
-      if (!selLeft) { setMsg('cableMsg','Select a left port first.','info'); return; }
-      const lc = selLeft.dataset.color;
-      const rc = this.dataset.color;
-      cxns[lc] = rc;
-      drawLines();
-      selLeft.classList.remove('selected');
-      selLeft = null;
-      checkCables();
-    });
-  });
-
-  function drawLines() {
-    const canvas = document.getElementById('cableCanvas');
-    if (!canvas) return;
-    canvas.width  = canvas.offsetWidth  || 100;
-    canvas.height = canvas.offsetHeight || 200;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    const cr = canvas.getBoundingClientRect();
-    Object.entries(cxns).forEach(([lc, rc]) => {
-      const lEl = document.querySelector('.left-port[data-color="'+lc+'"] .port-dot');
-      const rEl = document.querySelector('.right-port[data-color="'+rc+'"] .port-dot');
-      if (!lEl || !rEl) return;
-      const lr = lEl.getBoundingClientRect();
-      const rr = rEl.getBoundingClientRect();
-      const x1=lr.left+lr.width/2-cr.left, y1=lr.top+lr.height/2-cr.top;
-      const x2=rr.left+rr.width/2-cr.left, y2=rr.top+rr.height/2-cr.top;
-      const ok = lc === rc;
-      ctx.beginPath();
-      ctx.moveTo(x1,y1);
-      ctx.bezierCurveTo(x1+(x2-x1)*0.4,y1, x1+(x2-x1)*0.6,y2, x2,y2);
-      ctx.strokeStyle = ok ? colorHex(lc) : '#c43030';
-      ctx.lineWidth = 3;
-      ctx.shadowColor = ok ? colorHex(lc) : '#c43030';
-      ctx.shadowBlur = 8;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    });
-  }
-
-  function checkCables() {
-    const colors = ['red','blue','green','yellow'];
-    const done = colors.filter(c => cxns[c]).length;
-    if (done < 4) { setMsg('cableMsg', done+'/4 connected — keep going.','info'); return; }
-    const correct = colors.filter(c => cxns[c]===c).length;
-    if (correct === 4) {
-      setMsg('cableMsg','✔ ALL CABLES CORRECT — Power restored. Even Zez could appreciate this.','pass');
-      document.getElementById('f-cables').value = 'PASSED';
-    } else {
-      setMsg('cableMsg', correct+'/4 correct. Wrong connections shown in red. Try again.','fail');
-      document.getElementById('f-cables').value = 'FAILED — '+correct+'/4';
-    }
-  }
-
-  window.resetCables = function() {
-    Object.keys(cxns).forEach(k => delete cxns[k]);
-    selLeft = null;
-    const canvas = document.getElementById('cableCanvas');
-    if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-    document.querySelectorAll('.cable-port').forEach(p => p.classList.remove('selected','connected'));
-    setMsg('cableMsg','Select a left port to begin.','');
-    document.getElementById('f-cables').value = 'not attempted';
-  };
-  window.addEventListener('resize', drawLines);
-
-  // ── GAME 2: DRUG ID ──
-  window.pickDrug = function(el, correct) {
-    if (document.querySelector('.drug-card.selected-right')) return;
-    if (correct) {
-      el.classList.add('selected-right');
-      setMsg('drugMsg',"✔ CORRECT — That is Morphine. Use responsibly. Sleep didn't.",'pass');
-      document.getElementById('f-drug-game').value = 'PASSED';
-      document.querySelectorAll('.drug-card').forEach(c => c.style.pointerEvents='none');
-    } else {
-      el.classList.add('selected-wrong');
-      setMsg('drugMsg','✘ Incorrect. Do not inject that into anyone.','fail');
-      document.getElementById('f-drug-game').value = 'FAILED';
-      setTimeout(() => el.classList.remove('selected-wrong'), 600);
-    }
-  };
-
-  // ── GAME 3: REACTOR ──
-  let rPct = 300, rInterval = null, rActive = false;
-  const rCircum = 2 * Math.PI * 55;
-
-  function updateGauge() {
-    const ratio = Math.min((rPct-300)/100, 1);
-    const offset = rCircum - rCircum * ratio;
-    const arc = document.getElementById('reactorArc');
-    const pctEl = document.getElementById('reactorPct');
-    if (!arc || !pctEl) return;
-    arc.setAttribute('stroke-dashoffset', offset);
-    pctEl.textContent = Math.round(rPct)+'%';
-    const col = ratio > 0.7 ? '#ff2020' : ratio > 0.35 ? '#c43030' : '#d4a843';
-    arc.setAttribute('stroke', col);
-    pctEl.setAttribute('fill', col);
-  }
-
-  window.startReactor = function() {
-    rPct = 300; rActive = true;
-    document.getElementById('reactorStartBtn').style.display = 'none';
-    document.querySelectorAll('.reactor-btn').forEach(b => { b.classList.remove('wrong-btn','right-btn'); b.disabled = false; });
-    setMsg('reactorMsg','⚠ CRITICAL — Find the shutdown before meltdown.','fail');
-    document.getElementById('f-reactor-game').value = 'in progress';
-    clearInterval(rInterval);
-    rInterval = setInterval(() => {
-      rPct += 1.5;
-      updateGauge();
-      if (rPct >= 400) {
-        clearInterval(rInterval); rActive = false;
-        setMsg('reactorMsg','☢ MELTDOWN — 400% reached. Submarine is a small sun now.','fail');
-        document.getElementById('f-reactor-game').value = 'FAILED — MELTDOWN';
-        document.getElementById('reactorStartBtn').style.display = 'block';
-        document.getElementById('reactorStartBtn').textContent = '↺ Try Again';
-      }
-    }, 250);
-  };
-
-  window.reactorPress = function(btn, correct) {
-    if (!rActive) return;
-    if (correct) {
-      clearInterval(rInterval); rActive = false;
-      btn.classList.add('right-btn');
-      setMsg('reactorMsg','✔ SCRAM — Reactor shutdown at '+Math.round(rPct)+'%. Jager is silently relieved.','pass');
-      document.getElementById('f-reactor-game').value = 'PASSED — shut down at '+Math.round(rPct)+'%';
-    } else {
-      btn.classList.add('wrong-btn');
-      rPct += 20;
-      updateGauge();
-      setMsg('reactorMsg','✘ Wrong button! Output jumped to '+Math.round(rPct)+'%.','fail');
-      setTimeout(() => btn.classList.remove('wrong-btn'), 500);
-    }
-  };
-
-  // ── GAME 4: SPOT THE CLOWN ──
-  const crew = [
-    {name:'Vasquez',   avatar:'👷'},
-    {name:'Petrov',    avatar:'🧑‍🔧'},
-    {name:'Okafor',    avatar:'👨‍✈️'},
-    {name:'Lindqvist', avatar:'🧑‍🔬'},
-    {name:'Honksworth',avatar:'🤡', isClown:true},
-    {name:'Torres',    avatar:'🛡️'},
-  ];
-  let cTimer=null, cTime=10, cDone=false, cStarted=false;
-
-  window.startClownGame = function() {
-    cDone=false; cTime=10; cStarted=true;
-    document.getElementById('clownStartBtn').style.display='none';
-    document.getElementById('f-clown-game').value='in progress';
-    const fill = document.getElementById('clownTimerFill');
-    fill.style.width='100%'; fill.style.background='var(--danger2)';
-
-    const shuffled = [...crew].sort(()=>Math.random()-0.5);
-    const lineup = document.getElementById('crewLineup');
-    lineup.innerHTML='';
-    shuffled.forEach(member => {
-      const el = document.createElement('div');
-      el.className='crew-member';
-      el.innerHTML='<span class="crew-avatar">'+member.avatar+'</span><span class="crew-name">'+member.name+'</span>';
-      el.addEventListener('click', function() {
-        if (!cStarted||cDone) return;
-        if (member.isClown) {
-          clearInterval(cTimer); cDone=true;
-          el.classList.add('right-pick');
-          setMsg('clownMsg','✔ IDENTIFIED — '+cTime.toFixed(1)+'s left. Reindeer has already opened fire.','pass');
-          document.getElementById('f-clown-game').value='PASSED — '+cTime.toFixed(1)+'s left';
-          lineup.querySelectorAll('.crew-member').forEach(m=>m.style.pointerEvents='none');
-          document.getElementById('clownStartBtn').style.display='none';
-        } else {
-          el.classList.add('wrong-pick');
-          cTime = Math.max(0, cTime-2);
-          setMsg('clownMsg','✘ Not a clown! -2 seconds.','fail');
-          setTimeout(()=>el.classList.remove('wrong-pick'),400);
-        }
-      });
-      lineup.appendChild(el);
-    });
-
-    setMsg('clownMsg','Find the clown! Wrong picks cost 2 seconds.','info');
-    clearInterval(cTimer);
-    cTimer = setInterval(()=>{
-      cTime -= 0.1;
-      fill.style.width = Math.max(0,(cTime/10)*100)+'%';
-      if (cTime<=0 && !cDone) {
-        clearInterval(cTimer); cDone=true;
-        setMsg('clownMsg','✘ TIME UP — The clown escaped. Reindeer is disappointed.','fail');
-        document.getElementById('f-clown-game').value='FAILED — timed out';
-        document.getElementById('clownStartBtn').style.display='block';
-        document.getElementById('clownStartBtn').textContent='↺ Try Again';
-        lineup.querySelectorAll('.is-clown,.crew-member').forEach(m=>{
-          if(m.querySelector('.crew-avatar')&&m.querySelector('.crew-avatar').textContent==='🤡')
-            m.style.outline='2px solid var(--danger2)';
-        });
-      }
-    },100);
-  };
-
-  // ── HELPER ──
-  function setMsg(id, txt, cls) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = txt;
-    el.className = 'game-msg' + (cls ? ' '+cls : '');
-  }
-
-});
 </script>
-</body>
-</html>
