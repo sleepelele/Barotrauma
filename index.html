@@ -490,7 +490,7 @@ If you are reading this notice and still considering applying — welcome. You'r
       <label class="field-label">Salary Expectations</label>
       <span class="field-hint">In % of mission loot. The submarine needs fuel too, you know.</span>
       <div class="slider-row">
-        <input type="range" id="f-salary" min="0" max="5" value="1" step="1" oninput="updateSalary(this.value)"/>
+        <input type="range" id="f-salary" min="0" max="6" value="1" step="1" oninput="updateSalary(this.value)"/>
         <span class="salary-display" id="salary-val">1%</span>
       </div>
     </div>
@@ -888,7 +888,7 @@ document.getElementById('appForm').addEventListener('submit', async e => {
   const age   = document.getElementById('f-age').value;
   const clown = document.getElementById('f-clown').value;
   const reactor = (document.querySelector('input[name="reactor"]:checked') || {}).value || '';
-  const clownQ  = (document.querySelector('input[name="clown-resp"]:checked') || {}).value || '';
+  const clownQ  = (document.querySelector('input[name="clown_response"]:checked') || {}).value || '';
   const hullQ   = (document.querySelector('input[name="hull"]:checked') || {}).value || '';
   const heights = document.getElementById('f-heights').value;
   const declChecked = document.querySelectorAll('input[name="decl"]:checked').length;
@@ -960,7 +960,7 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         dislikes:      document.getElementById('f-dislikes').value.trim(),
         clown_history: clown,
         availability:  getAvailability(),
-        salary_pct:    parseInt(document.getElementById('f-salary').value),
+        salary_pct:    parseInt(document.getElementById('f-salary').value) === 6 ? 99 : parseInt(document.getElementById('f-salary').value),
         afraid_of_heights: heights,
         reactor_response:  reactor,
         clown_response:    clownQ,
