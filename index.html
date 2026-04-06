@@ -176,8 +176,12 @@
     .decl-item { display:flex; align-items:flex-start; gap:9px; cursor:pointer; padding:8px 10px; border:1px solid transparent; transition:all 0.2s; }
     .decl-item:hover { border-color:var(--border); background:rgba(138,173,90,0.03); }
     .decl-item input { display:none; }
+    .decl-item .avail-box { width:16px; height:16px; min-width:16px; margin-top:2px; border:1px solid var(--border2); background:transparent; display:flex; align-items:center; justify-content:center; font-size:0.6rem; color:transparent; transition:all 0.2s; }
     .decl-item input:checked ~ .avail-box { border-color:var(--accent); background:var(--accent); color:var(--bg); }
-    .decl-item .avail-label { flex:1; line-height:1.5; }
+    .decl-item .avail-label { flex:1; line-height:1.5; color:var(--text-dim); transition:color 0.2s; }
+    .decl-item:has(input:checked) .avail-label { color:var(--text-bright); }
+    .decl-item.decl-required { border-color:transparent; }
+    .decl-item.decl-required .avail-box { border-color:var(--danger2); }
     input.err,textarea.err{border-color:var(--danger2)!important;box-shadow:0 0 6px rgba(196,48,48,0.3)!important;}
     .err-msg{font-family:'Share Tech Mono',monospace;font-size:0.66rem;color:var(--danger2);margin-top:5px;display:none;}
     .err-msg.show{display:block;}
@@ -487,6 +491,7 @@ If you are reading this notice and still considering applying — welcome. You'r
       <span class="section-tag">FIELD 15</span>
       <label class="field-label">Crew Declarations</label>
       <span class="field-hint">Tick all that apply. Or lie. We'll find out either way.</span>
+      <span class="err-msg" id="e-decl">You must tick all declarations before submitting.</span>
       <div class="declarations-grid">
         <label class="decl-item"><input type="checkbox" name="decl" value="no_reactor"/><span class="avail-box">✔</span><span class="avail-label">I will not touch the reactor &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">(I probably will if the Electrician falls asleep)</span></span></label>
         <label class="decl-item"><input type="checkbox" name="decl" value="oxygen"/><span class="avail-box">✔</span><span class="avail-label">I understand that oxygen is important for the submarine's functionality</span></label>
@@ -739,6 +744,15 @@ document.getElementById('appForm').addEventListener('submit', async e => {
   const heights = document.getElementById('f-heights').value;
   if (!heights) { document.getElementById('e-heights').classList.add('show'); valid = false; }
   else          { document.getElementById('e-heights').classList.remove('show'); }
+
+  // All 6 declarations must be checked
+  const declChecked = document.querySelectorAll('input[name="decl"]:checked').length;
+  if (declChecked < 6) {
+    document.getElementById('e-decl').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('e-decl').classList.remove('show');
+  }
 
   if (!valid) return;
 
