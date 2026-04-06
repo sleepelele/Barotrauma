@@ -164,6 +164,20 @@
     .submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
     .submit-note{margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:0.64rem;color:var(--text-dim);letter-spacing:0.12em;}
 
+
+    /* MCQ multiple choice */
+    .mcq-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    @media(max-width:520px){.mcq-grid{grid-template-columns:1fr}}
+    .mcq-btn { border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:"Share Tech Mono",monospace; font-size:0.78rem; letter-spacing:0.06em; padding:12px 14px; cursor:pointer; transition:all 0.2s; user-select:none; }
+    .mcq-btn:hover { border-color:var(--border2); color:var(--text); background:rgba(17,34,51,0.8); }
+    .mcq-btn.selected { border-color:var(--accent); color:var(--accent); background:rgba(138,173,90,0.08); box-shadow:var(--glow-g); }
+    /* Declarations */
+    .declarations-grid { display:flex; flex-direction:column; gap:8px; }
+    .decl-item { display:flex; align-items:flex-start; gap:9px; cursor:pointer; padding:8px 10px; border:1px solid transparent; transition:all 0.2s; }
+    .decl-item:hover { border-color:var(--border); background:rgba(138,173,90,0.03); }
+    .decl-item input { display:none; }
+    .decl-item input:checked ~ .avail-box { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+    .decl-item .avail-label { flex:1; line-height:1.5; }
     input.err,textarea.err{border-color:var(--danger2)!important;box-shadow:0 0 6px rgba(196,48,48,0.3)!important;}
     .err-msg{font-family:'Share Tech Mono',monospace;font-size:0.66rem;color:var(--danger2);margin-top:5px;display:none;}
     .err-msg.show{display:block;}
@@ -174,6 +188,44 @@
     .success-title{font-family:'Orbitron',sans-serif;font-size:1.3rem;color:var(--success);text-shadow:0 0 20px rgba(106,170,58,0.4);margin-bottom:10px;letter-spacing:0.1em;}
     .success-body{font-family:'Share Tech Mono',monospace;font-size:0.76rem;color:var(--text-dim);line-height:2;}
     .success-body span{color:var(--accent);}
+
+    /* MCQ options */
+    .mcq-grid { display:flex; flex-direction:column; gap:8px; }
+    .mcq-option { display:flex; align-items:center; gap:12px; cursor:pointer; padding:10px 14px; border:1px solid var(--border); background:rgba(4,10,16,0.6); transition:all 0.2s; user-select:none; }
+    .mcq-option:hover { border-color:var(--border2); background:rgba(17,34,51,0.8); }
+    .mcq-option input[type="radio"] { display:none; }
+    .mcq-option.selected { border-color:var(--accent); background:rgba(138,173,90,0.1); box-shadow:var(--glow-g); }
+    .mcq-option.selected .mcq-letter { color:var(--accent); border-color:var(--accent); }
+    .mcq-option.selected .mcq-text { color:var(--text-bright); }
+    .mcq-letter { font-family:'Orbitron',sans-serif; font-size:0.68rem; font-weight:700; color:var(--text-dim); border:1px solid var(--border); width:26px; height:26px; min-width:26px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+    .mcq-text { font-family:'Share Tech Mono',monospace; font-size:0.82rem; color:var(--text-dim); transition:color 0.2s; }
+
+    /* Yes/No toggle */
+    .yn-row { display:flex; gap:10px; }
+    .yn-btn { flex:1; padding:12px; border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:'Orbitron',sans-serif; font-size:0.72rem; letter-spacing:0.14em; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+    .yn-btn:hover { border-color:var(--border2); color:var(--text); }
+    .yn-btn.yn-yes { border-color:var(--danger2); color:var(--danger2); background:rgba(122,32,32,0.12); box-shadow:0 0 10px rgba(196,48,48,0.2); }
+    .yn-btn.yn-no  { border-color:var(--success); color:var(--success); background:rgba(106,170,58,0.08); box-shadow:0 0 10px rgba(106,170,58,0.2); }
+  
+    /* MCQ options */
+    .mcq-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px; }
+    @media(max-width:520px){.mcq-grid{grid-template-columns:1fr}}
+    .mcq-option {
+      display:flex; align-items:center; gap:12px;
+      border:1px solid var(--border); background:rgba(4,10,16,0.6);
+      padding:12px 14px; cursor:pointer; transition:all 0.2s; user-select:none;
+    }
+    .mcq-option:hover { border-color:var(--border2); background:rgba(17,34,51,0.8); }
+    .mcq-option.selected { border-color:var(--accent); background:rgba(138,173,90,0.1); box-shadow:var(--glow-g); }
+    .mcq-letter {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:0.72rem;
+      color:var(--text-dim); min-width:20px; transition:color 0.2s;
+      border:1px solid var(--border); padding:2px 6px; text-align:center;
+    }
+    .mcq-option.selected .mcq-letter { color:var(--accent); border-color:var(--accent); }
+    .mcq-text { font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:var(--text-dim); transition:color 0.2s; line-height:1.4; }
+    .mcq-option.selected .mcq-text { color:var(--text-bright); }
+
   </style>
 </head>
 <body>
@@ -370,9 +422,48 @@ If you are reading this notice and still considering applying — welcome. You'r
       </div>
     </div>
 
-    <!-- FIELD 10: Why hire you -->
+    <!-- FIELD 10: Reactor scenario -->
     <div class="section">
       <span class="section-tag">FIELD 10</span>
+      <label class="field-label">Situational Assessment — Reactor</label>
+      <span class="field-hint">You see the reactor at 300% power and rising. What do you do?</span>
+      <div class="mcq-grid" id="mcq-reactor">
+        <label class="mcq-option"><input type="radio" name="reactor" value="A) Turn it off"/><span class="mcq-letter">A</span><span class="mcq-text">Turn it off</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor" value="B) Blame the assistant"/><span class="mcq-letter">B</span><span class="mcq-text">Blame the assistant</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor" value="C) Increase it to 400% for science"/><span class="mcq-letter">C</span><span class="mcq-text">Increase it to 400% for science</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor" value="D) Say nothing, its the Electricians duty"/><span class="mcq-letter">D</span><span class="mcq-text">Say nothing — it's the Electrician's duty</span></label>
+      </div>
+    </div>
+
+    <!-- FIELD 11: Clown scenario -->
+    <div class="section">
+      <span class="section-tag">FIELD 11</span>
+      <label class="field-label">Situational Assessment — Clown</label>
+      <span class="field-hint">A clown is honking at you. Your response?</span>
+      <div class="mcq-grid" id="mcq-clown">
+        <label class="mcq-option"><input type="radio" name="clown_response" value="A) Beat him up"/><span class="mcq-letter">A</span><span class="mcq-text">Beat him up</span></label>
+        <label class="mcq-option"><input type="radio" name="clown_response" value="B) Kindly ask him to stop honking"/><span class="mcq-letter">B</span><span class="mcq-text">Kindly ask him to stop honking</span></label>
+        <label class="mcq-option"><input type="radio" name="clown_response" value="C) Call for Security"/><span class="mcq-letter">C</span><span class="mcq-text">Call for Security</span></label>
+        <label class="mcq-option"><input type="radio" name="clown_response" value="D) Honk back louder"/><span class="mcq-letter">D</span><span class="mcq-text">Honk back louder</span></label>
+      </div>
+    </div>
+
+    <!-- FIELD 12: Heights -->
+    <div class="section">
+      <span class="section-tag">FIELD 12</span>
+      <label class="field-label">Psychological Screening — Heights</label>
+      <span class="field-hint">Are you afraid of heights? We ask because the reactor catwalk is very tall and the railings are suggestions.</span>
+      <div class="yn-row">
+        <button type="button" class="yn-btn" id="yn-yes" onclick="setHeights('Yes')">😰 &nbsp;Yes</button>
+        <button type="button" class="yn-btn" id="yn-no"  onclick="setHeights('No')">💪 &nbsp;No</button>
+      </div>
+      <input type="hidden" id="f-heights" value=""/>
+    </div>
+
+    <!-- FIELD 13: Why hire you -->
+
+    <div class="section">
+      <span class="section-tag">FIELD 13</span>
       <label class="field-label" for="f-whyhire">Why Should I Hire You?</label>
       <span class="field-hint">Make your case. Bribery, flattery, and threats are all considered.</span>
       <textarea id="f-whyhire" placeholder="Convince command. You have one chance."></textarea>
@@ -380,10 +471,85 @@ If you are reading this notice and still considering applying — welcome. You'r
 
     <!-- FIELD 11: Open suggestions -->
     <div class="section">
-      <span class="section-tag">FIELD 11</span>
+      <span class="section-tag">FIELD 14</span>
       <label class="field-label" for="f-suggestions">Open Suggestions</label>
       <span class="field-hint">Anything else command should know. Grievances, requests, or threats.</span>
       <textarea id="f-suggestions" placeholder="Optional. This field is monitored."></textarea>
+    </div>
+
+    <!-- FIELD 12: Reactor -->
+    <div class="section">
+      <span class="section-tag">FIELD 12</span>
+      <label class="field-label">You see the reactor at 300% power and rising. What do you do?</label>
+      <span class="field-hint">Choose carefully. There is a correct answer. There is also a very wrong answer.</span>
+      <div class="mcq-grid" id="reactor-grid">
+        <div class="mcq-option" data-group="reactor" data-val="A) Turn it off">
+          <span class="mcq-letter">A</span>
+          <span class="mcq-text">Turn it off</span>
+        </div>
+        <div class="mcq-option" data-group="reactor" data-val="B) Blame the assistant">
+          <span class="mcq-letter">B</span>
+          <span class="mcq-text">Blame the assistant</span>
+        </div>
+        <div class="mcq-option" data-group="reactor" data-val="C) Increase it to 400% for science">
+          <span class="mcq-letter">C</span>
+          <span class="mcq-text">Increase it to 400% for science</span>
+        </div>
+        <div class="mcq-option" data-group="reactor" data-val="D) Say nothing, it is the Electrician's duty">
+          <span class="mcq-letter">D</span>
+          <span class="mcq-text">Say nothing — it's the Electrician's duty</span>
+        </div>
+      </div>
+      <input type="hidden" id="f-reactor" value=""/>
+      <span class="err-msg" id="e-reactor">Command requires an answer. Any answer.</span>
+    </div>
+
+    <!-- FIELD 13: Clown -->
+    <div class="section">
+      <span class="section-tag">FIELD 13</span>
+      <label class="field-label">A clown is honking at you. Your response?</label>
+      <span class="field-hint">Your answer will be shared with the Clown Mother. Probably.</span>
+      <div class="mcq-grid" id="clown-grid">
+        <div class="mcq-option" data-group="clown" data-val="A) Beat him up">
+          <span class="mcq-letter">A</span>
+          <span class="mcq-text">Beat him up</span>
+        </div>
+        <div class="mcq-option" data-group="clown" data-val="B) Kindly ask him to stop honking">
+          <span class="mcq-letter">B</span>
+          <span class="mcq-text">Kindly ask him to stop honking</span>
+        </div>
+        <div class="mcq-option" data-group="clown" data-val="C) Call for Security">
+          <span class="mcq-letter">C</span>
+          <span class="mcq-text">Call for Security</span>
+        </div>
+        <div class="mcq-option" data-group="clown" data-val="D) Honk back louder">
+          <span class="mcq-letter">D</span>
+          <span class="mcq-text">Honk back louder</span>
+        </div>
+      </div>
+      <input type="hidden" id="f-clown-q" value=""/>
+      <span class="err-msg" id="e-clown-q">This is not optional. The clown is still honking.</span>
+    </div>
+
+    <!-- FIELD 14: Heights -->
+    <div class="section">
+      <span class="section-tag">FIELD 14</span>
+      <label class="field-label">Are you afraid of heights?</label>
+      <span class="field-hint">We are operating at the bottom of an ocean on an ice moon. Asking for a friend.</span>
+      <div class="clown-row">
+        <button type="button" class="clown-btn" id="btn-heights-no"  onclick="setHeights('No')">✅ &nbsp;No</button>
+        <button type="button" class="clown-btn" id="btn-heights-yes" onclick="setHeights('Yes')">😰 &nbsp;Yes</button>
+      </div>
+      <input type="hidden" id="f-heights" value=""/>
+      <span class="err-msg" id="e-heights">Please answer. It will not affect your application. Much.</span>
+    </div>
+
+    <!-- FIELD 15: Morphine defense -->
+    <div class="section">
+      <span class="section-tag">FIELD 15</span>
+      <label class="field-label" for="f-morphine">You have been accused of stealing Morphine from the medical room. Defend yourself.</label>
+      <span class="field-hint">Your response will be reviewed by the Chief Medical Officer. Who is also the one accusing you.</span>
+      <textarea id="f-morphine" placeholder="I can explain. Actually, I cannot explain. But here is what happened..."></textarea>
     </div>
 
     <div class="submit-zone">
@@ -481,6 +647,27 @@ function setClown(v) {
   document.getElementById('e-clown').classList.remove('show');
 }
 
+
+// ═══════════ MCQ OPTIONS ═══════════
+document.querySelectorAll('.mcq-grid').forEach(grid => {
+  grid.querySelectorAll('.mcq-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      grid.querySelectorAll('.mcq-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      opt.querySelector('input[type="radio"]').checked = true;
+    });
+  });
+});
+
+// ═══════════ HEIGHTS ═══════════
+function setHeights(v) {
+  document.getElementById('f-heights').value = v;
+  document.getElementById('yn-yes').classList.toggle('yn-yes', v === 'Yes');
+  document.getElementById('yn-no').classList.toggle('yn-no',  v === 'No');
+  // reset the other
+  if (v === 'Yes') document.getElementById('yn-no').classList.remove('yn-no');
+  if (v === 'No')  document.getElementById('yn-yes').classList.remove('yn-yes');
+}
 // ═══════════ DAY AVAILABILITY ═══════════
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const TIMES = ['00:00','06:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00',
@@ -524,6 +711,29 @@ function getAvailability() {
   return result.join(' | ');
 }
 
+// ═══════════ MCQ SELECTIONS ═══════════
+function setupMCQ(gridId, hiddenId) {
+  document.querySelectorAll(`#${gridId} .mcq-option`).forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll(`#${gridId} .mcq-option`).forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      document.getElementById(hiddenId).value = opt.dataset.val;
+      // clear error
+      const err = document.getElementById(hiddenId.replace('f-','e-'));
+      if (err) err.classList.remove('show');
+    });
+  });
+}
+setupMCQ('reactor-grid', 'f-reactor');
+setupMCQ('clown-grid',   'f-clown-q');
+
+function setHeights(v) {
+  document.getElementById('f-heights').value = v;
+  document.getElementById('btn-heights-no').classList.toggle('no-active',  v === 'No');
+  document.getElementById('btn-heights-yes').classList.toggle('yes-active', v === 'Yes');
+  document.getElementById('e-heights').classList.remove('show');
+}
+
 // ═══════════ SUPABASE ═══════════
 const SUPA_URL = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
@@ -555,6 +765,18 @@ document.getElementById('appForm').addEventListener('submit', async e => {
   if (!clown) { document.getElementById('e-clown').classList.add('show'); valid = false; }
   else        { document.getElementById('e-clown').classList.remove('show'); }
 
+  const reactor = document.getElementById('f-reactor').value;
+  if (!reactor) { document.getElementById('e-reactor').classList.add('show'); valid = false; }
+  else          { document.getElementById('e-reactor').classList.remove('show'); }
+
+  const clownQ = document.getElementById('f-clown-q').value;
+  if (!clownQ) { document.getElementById('e-clown-q').classList.add('show'); valid = false; }
+  else         { document.getElementById('e-clown-q').classList.remove('show'); }
+
+  const heights = document.getElementById('f-heights').value;
+  if (!heights) { document.getElementById('e-heights').classList.add('show'); valid = false; }
+  else          { document.getElementById('e-heights').classList.remove('show'); }
+
   if (!valid) return;
 
   const btn = document.getElementById('submitBtn');
@@ -574,8 +796,28 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         clown_history: clown,
         availability:  getAvailability(),
         salary_pct:    parseInt(document.getElementById('f-salary').value),
-        why_hire:      document.getElementById('f-whyhire').value.trim(),
+        afraid_of_heights: document.getElementById('f-heights').value,
+        reactor_response:  document.getElementById('f-reactor').value,
+        clown_response:    document.getElementById('f-clown-resp').value,
+        hull_response:     document.getElementById('f-hull').value,
+        morphine_defense:  document.getElementById('f-morphine').value.trim(),
+        declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
+        why_hire:          document.getElementById('f-whyhire').value.trim(),
+        reactor_answer: (document.querySelector('input[name="reactor"]:checked') || {}).value || '',
+        clown_answer:   (document.querySelector('input[name="clown_response"]:checked') || {}).value || '',
+        afraid_heights: document.getElementById('f-heights').value,
+        afraid_of_heights: document.getElementById('f-heights').value,
+        reactor_response:  document.getElementById('f-reactor').value,
+        clown_response:    document.getElementById('f-clown-resp').value,
+        hull_response:     document.getElementById('f-hull').value,
+        morphine_defense:  document.getElementById('f-morphine').value.trim(),
+        declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
+        why_hire:          document.getElementById('f-whyhire').value.trim(),
         suggestions:   document.getElementById('f-suggestions').value.trim(),
+        reactor_response: document.getElementById('f-reactor').value,
+        clown_response:   document.getElementById('f-clown-q').value,
+        afraid_of_heights: document.getElementById('f-heights').value,
+        morphine_defense:  document.getElementById('f-morphine').value.trim(),
         submitted_at:  new Date().toISOString()
       })
     });
@@ -589,6 +831,26 @@ document.getElementById('appForm').addEventListener('submit', async e => {
     alert('⚠ Transmission failed. Check connection and try again.');
   }
 });
+
+// ═══════════ MCQ BUTTONS ═══════════
+document.querySelectorAll('.mcq-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.group;
+    document.querySelectorAll(`.mcq-btn[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    // find hidden input by group name mapping
+    const map = {'reactor':'f-reactor','clown-resp':'f-clown-resp','hull':'f-hull'};
+    const inputId = map[group];
+    if (inputId) document.getElementById(inputId).value = btn.dataset.val;
+  });
+});
+
+// ═══════════ YES/NO TOGGLE ═══════════
+function setToggle(hiddenId, val, btnYesId, btnNoId) {
+  document.getElementById(hiddenId).value = val;
+  document.getElementById(btnYesId).classList.toggle('yes-active', val === 'yes');
+  document.getElementById(btnNoId).classList.toggle('no-active',  val === 'no');
+}
 </script>
 </body>
 </html>
