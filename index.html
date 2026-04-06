@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Barotrauma — Crew Application</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg:        #050d14;
-      --panel:     #081520;
-      --border:    #1a3a50;
-      --accent:    #00c8ff;
-      --accent2:   #ff6b35;
-      --warn:      #ffcc00;
-      --text:      #a8cfe0;
-      --text-dim:  #4a7a96;
-      --success:   #00ff88;
-      --glow:      0 0 12px rgba(0,200,255,0.4);
-      --glow2:     0 0 18px rgba(255,107,53,0.5);
+      --bg:         #060e15;
+      --bg2:        #091420;
+      --panel:      #0d1e2ecc;
+      --panel2:     #112233dd;
+      --border:     #1e3a50;
+      --border2:    #2a4e68;
+      --accent:     #8aad5a;
+      --accent-dim: #4d6632;
+      --rust:       #c47a35;
+      --rust-dim:   #7a4a1e;
+      --text:       #7a9db0;
+      --text-bright:#a8c4d4;
+      --text-dim:   #3a5a6e;
+      --danger2:    #c43030;
+      --warn:       #b8842a;
+      --success:    #6aaa3a;
+      --glow-g:     0 0 14px rgba(138,173,90,0.35);
+      --glow-r:     0 0 14px rgba(196,122,53,0.4);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,783 +39,632 @@
       cursor: crosshair;
     }
 
-    /* ── Animated background ── */
-    .bg-layer {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    /* ── BACKGROUND IMAGE with parallax ── */
+    .bg-image {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url('https://raw.githubusercontent.com/sleepelele/Barotrauma/main/bg.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      transform: scale(1.12); /* extra space for parallax movement */
+      will-change: transform;
+      transition: transform 0.05s linear;
     }
-    .bubbles {
-      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+    /* Dark overlay to keep text readable */
+    .bg-overlay {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        linear-gradient(180deg,
+          rgba(4,10,16,0.82) 0%,
+          rgba(4,10,16,0.65) 40%,
+          rgba(4,10,16,0.80) 100%
+        );
     }
-    .bubble {
-      position: absolute;
-      bottom: -80px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(0,200,255,0.15), transparent 70%);
-      border: 1px solid rgba(0,200,255,0.08);
-      animation: rise linear infinite;
-    }
-    @keyframes rise {
-      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 0.6; }
-      100% { transform: translateY(-110vh) translateX(40px) scale(1.2); opacity: 0; }
+    /* Red tint layer — subtle, matches key art */
+    .bg-red {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(80,8,8,0.28) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     /* Scanlines */
-    body::before {
-      content: '';
+    .scanlines {
       position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 3px,
-        rgba(0,0,0,0.08) 3px,
-        rgba(0,0,0,0.08) 4px
+        to bottom, transparent 0px, transparent 3px,
+        rgba(0,0,0,0.055) 3px, rgba(0,0,0,0.055) 4px
       );
     }
-
     /* Vignette */
-    body::after {
-      content: '';
+    .vignette {
       position: fixed; inset: 0; z-index: 1; pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+      background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.85) 100%);
     }
 
-    /* ── Layout ── */
+    /* Pressure breathe animation on whole page */
+    .page-breathe {
+      animation: breathe 6s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%,100% { filter: brightness(1) saturate(1); }
+      50%      { filter: brightness(0.94) saturate(0.92); }
+    }
+
+    /* Progress bar */
+    .progress-wrap { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 999; background: rgba(0,0,0,0.5); }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; box-shadow: var(--glow-g); }
+
+    /* Bubbles */
+    .bubbles { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .bubble {
+      position: absolute; bottom: -60px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(138,173,90,0.07), transparent 70%);
+      border: 1px solid rgba(138,173,90,0.04);
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0); opacity: 0; }
+      8%   { opacity: 0.7; }
+      92%  { opacity: 0.25; }
+      100% { transform: translateY(-110vh) translateX(22px); opacity: 0; }
+    }
+
+    /* Sonar */
+    .sonar { position: fixed; bottom: 36px; left: 36px; width: 110px; height: 110px; z-index: 3; pointer-events: none; opacity: 0.18; }
+    @media(max-width:700px){.sonar{display:none}}
+    .sonar-sweep { transform-origin: 55px 55px; animation: sweep 4.5s linear infinite; }
+    @keyframes sweep { to { transform: rotate(360deg); } }
+    .sonar-ping  { animation: ping 4.5s ease-out infinite; transform-origin: 55px 55px; }
+    @keyframes ping { 0%{transform:scale(0.1);opacity:0.8} 100%{transform:scale(1);opacity:0} }
+
+    /* Depth meter */
+    .depth-meter { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.28; }
+    @media(max-width:900px){.depth-meter{display:none}}
+    .dm-label { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em; color: var(--accent); writing-mode: vertical-rl; margin-bottom: 4px; }
+    .dm-track  { width: 2px; height: 160px; background: var(--border); position: relative; }
+    .dm-fill   { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--accent); transition: height 0.4s ease; box-shadow: var(--glow-g); }
+    .dm-val    { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: var(--accent); margin-top: 3px; }
+
+    /* Page layout */
     .page {
       position: relative; z-index: 2;
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
+      max-width: 820px; margin: 0 auto;
+      padding: 70px 20px 90px;
     }
 
-    /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 48px;
-      animation: fadeDown 0.8s ease both;
-    }
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* ── HEADER ── */
+    header { text-align: center; margin-bottom: 44px; }
 
-    .corp-badge {
-      display: inline-block;
+    .corp-tag {
+      display: inline-flex; align-items: center; gap: 10px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.25em;
-      color: var(--accent2);
-      border: 1px solid var(--accent2);
-      padding: 4px 14px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      box-shadow: var(--glow2);
-      animation: pulse-border 3s ease-in-out infinite;
+      font-size: 0.62rem; letter-spacing: 0.24em;
+      color: var(--rust); text-transform: uppercase;
+      border: 1px solid var(--rust-dim);
+      padding: 5px 16px; margin-bottom: 22px;
+      box-shadow: var(--glow-r);
+      opacity: 0;
+      animation: slideDown 0.7s 0.1s ease forwards;
     }
-    @keyframes pulse-border {
-      0%, 100% { box-shadow: var(--glow2); }
-      50%       { box-shadow: 0 0 28px rgba(255,107,53,0.7); }
+    .corp-tag::before, .corp-tag::after {
+      content: ''; width: 5px; height: 5px;
+      background: var(--rust); border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
     }
+    .corp-tag::after { animation-delay: 1s; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
 
+    /* Glitch title */
     h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: clamp(1.8rem, 5vw, 3rem);
-      line-height: 1.1;
-      color: #fff;
-      text-shadow: 0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,200,255,0.2);
-      letter-spacing: 0.04em;
-    }
-    h1 span { color: var(--accent); }
-
-    .subtitle {
-      margin-top: 12px;
-      font-size: 0.88rem;
-      color: var(--text-dim);
-      letter-spacing: 0.12em;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .depth-bar {
-      margin: 24px auto 0;
-      width: 200px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      box-shadow: var(--glow);
-    }
-
-    /* ── Warning banner ── */
-    .warning-strip {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--warn);
-      border: 1px solid rgba(255,204,0,0.3);
-      background: rgba(255,204,0,0.05);
-      padding: 10px 16px;
-      margin-bottom: 32px;
-      letter-spacing: 0.1em;
-      animation: fadeUp 0.9s 0.3s ease both;
-    }
-    .warning-strip::before { content: '⚠ '; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Form panels ── */
-    .form-section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      padding: 28px 28px 24px;
-      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      line-height: 1.05; color: var(--text-bright);
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 30px rgba(138,173,90,0.2), 0 0 60px rgba(138,173,90,0.08);
       position: relative;
-      animation: fadeUp 0.7s ease both;
-      transition: border-color 0.3s;
+      opacity: 0;
+      animation: slideDown 0.8s 0.3s ease forwards;
     }
-    .form-section:hover { border-left-color: var(--accent2); }
-    .form-section::before {
-      content: attr(data-index);
-      position: absolute;
-      top: -1px; right: 16px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      letter-spacing: 0.15em;
-      background: var(--panel);
-      padding: 2px 8px;
-      border: 1px solid var(--border);
-      border-top: none;
-    }
+    h1 em { color: var(--accent); font-style: normal; }
 
-    label {
-      display: block;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    .field-hint {
-      font-family: 'Exo 2', sans-serif;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      font-weight: 300;
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-      font-style: italic;
-      display: block;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    textarea,
-    select {
-      width: 100%;
-      background: rgba(0,200,255,0.03);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.9rem;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
-      -webkit-appearance: none;
-    }
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: var(--glow), inset 0 0 20px rgba(0,200,255,0.04);
-      background: rgba(0,200,255,0.06);
-    }
-    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
-    select { cursor: pointer; }
-    select option { background: #0a1e2e; color: var(--text); }
-
-    /* Salary slider */
-    .slider-wrap { display: flex; align-items: center; gap: 16px; }
-    input[type="range"] {
-      flex: 1;
-      -webkit-appearance: none;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent) 0%, var(--border) 0%);
-      border: none;
-      outline: none;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px; height: 18px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: var(--glow);
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
-    .salary-val {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.1rem;
-      color: var(--accent);
-      min-width: 56px;
-      text-align: right;
-    }
-
-    /* Two-col row */
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 520px) { .row-2 { grid-template-columns: 1fr; } }
-
-    /* ── Role cards ── */
-    .roles-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    @media (max-width: 520px) { .roles-grid { grid-template-columns: repeat(2, 1fr); } }
-
-    .role-card {
-      border: 1px solid var(--border);
-      padding: 14px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      user-select: none;
-    }
-    .role-card input[type="radio"] { display: none; }
-    .role-card:hover { border-color: var(--accent); background: rgba(0,200,255,0.05); }
-    .role-card.selected {
-      border-color: var(--accent);
-      background: rgba(0,200,255,0.1);
-      box-shadow: var(--glow);
-    }
-    .role-card.selected .role-name { color: var(--accent); }
-    .role-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
-    .role-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      transition: color 0.2s;
-    }
-    .role-check {
-      position: absolute; top: 5px; right: 6px;
-      font-size: 0.6rem; color: var(--accent);
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .role-card.selected .role-check { opacity: 1; }
-
-    /* ── Clown warning ── */
-    .clown-options { display: flex; gap: 12px; }
-    .clown-btn {
-      flex: 1;
-      padding: 14px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-dim);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.15em;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-transform: uppercase;
-    }
-    .clown-btn:hover { border-color: var(--warn); color: var(--warn); }
-    .clown-btn.active-no  { border-color: var(--success); color: var(--success); background: rgba(0,255,136,0.06); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
-    .clown-btn.active-yes { border-color: var(--accent2); color: var(--accent2); background: rgba(255,107,53,0.08); box-shadow: var(--glow2); }
-
-    /* ── Availability checkboxes ── */
-    .avail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .avail-item { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 10px; border: 1px solid transparent; transition: all 0.2s; }
-    .avail-item:hover { border-color: var(--border); background: rgba(0,200,255,0.04); }
-    .avail-item input { display: none; }
-    .avail-box {
-      width: 16px; height: 16px; min-width: 16px;
-      border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.6rem; color: transparent;
-      transition: all 0.2s;
-    }
-    .avail-item input:checked ~ .avail-box { border-color: var(--accent); background: var(--accent); color: #000; }
-    .avail-label { font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--text-dim); transition: color 0.2s; }
-    .avail-item:has(input:checked) .avail-label { color: var(--text); }
-
-    /* ── Submit button ── */
-    .submit-zone { text-align: center; margin-top: 36px; }
-    .submit-btn {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--bg);
-      background: var(--accent);
-      border: none;
-      padding: 18px 60px;
-      cursor: pointer;
-      position: relative;
+    /* Glitch effect on h1 */
+    h1::before, h1::after {
+      content: attr(data-text);
+      position: absolute; top: 0; left: 0; right: 0;
       overflow: hidden;
-      transition: all 0.25s;
-      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      opacity: 0;
     }
-    .submit-btn::before {
+    h1::before {
+      color: #c43030; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+      animation: glitch1 7s 2s ease-in-out infinite;
+    }
+    h1::after {
+      color: var(--accent); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+      animation: glitch2 7s 2.5s ease-in-out infinite;
+    }
+    @keyframes glitch1 {
+      0%,90%,100% { opacity:0; transform:translate(0); }
+      91%  { opacity:0.7; transform:translate(-3px, 1px); }
+      92%  { opacity:0; transform:translate(0); }
+      93%  { opacity:0.5; transform:translate(2px,-1px); }
+      94%  { opacity:0; }
+    }
+    @keyframes glitch2 {
+      0%,90%,100% { opacity:0; transform:translate(0); }
+      91%  { opacity:0.6; transform:translate(3px, -1px); }
+      92%  { opacity:0; transform:translate(0); }
+      93%  { opacity:0.4; transform:translate(-2px,1px); }
+      94%  { opacity:0; }
+    }
+
+    /* Typing subtitle */
+    .subtitle-wrap {
+      margin-top: 10px; height: 1.4em;
+      opacity: 0; animation: fadeIn 0.1s 1.2s ease forwards;
+    }
+    .subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.16em;
+      display: inline-block; overflow: hidden;
+      white-space: nowrap; width: 0;
+      border-right: 2px solid var(--accent);
+      animation: typing 1.8s 1.3s steps(40) forwards, blink-cursor 0.8s 3.2s step-end infinite;
+    }
+    @keyframes typing { from{width:0} to{width:100%} }
+    @keyframes blink-cursor { 0%,100%{border-color:var(--accent)} 50%{border-color:transparent} }
+
+    .header-rule {
+      margin: 18px auto 0; width: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: expandRule 0.8s 0.8s ease forwards;
+    }
+    @keyframes expandRule { to { width: 160px; } }
+
+    @keyframes slideDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn    { to{opacity:1} }
+
+    /* Warn strip */
+    .warn-strip {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+      color: var(--warn); border: 1px solid rgba(184,132,42,0.22);
+      background: rgba(4,10,16,0.7);
+      padding: 10px 16px; margin-bottom: 30px;
+      letter-spacing: 0.08em; line-height: 1.6;
+      opacity: 0; animation: slideUp 0.7s 0.5s ease forwards;
+    }
+    .warn-strip::before { content: '⚠  '; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── SECTIONS ── */
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-dim);
+      padding: 24px 26px 20px;
+      margin-bottom: 16px;
+      position: relative;
+      /* Red tint reveal animation */
+      animation: revealSection 0.6s ease both;
+      transition: border-left-color 0.3s, background 0.3s, box-shadow 0.3s;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    @keyframes revealSection {
+      0%   { opacity:0; transform:translateY(14px); filter:saturate(0) brightness(0.6); }
+      40%  { filter:saturate(0.3) brightness(0.8) sepia(0.4); }
+      100% { opacity:1; transform:translateY(0); filter:saturate(1) brightness(1); }
+    }
+    .section:hover {
+      border-left-color: var(--accent);
+      background: var(--panel2);
+      box-shadow: inset 0 0 30px rgba(138,173,90,0.03), 0 0 0 1px rgba(138,173,90,0.08);
+    }
+
+    /* Light sweep on hover */
+    .section::after {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(138,173,90,0.04) 50%, transparent 100%);
       transform: translateX(-100%);
-      transition: transform 0.5s;
+      pointer-events: none;
+      transition: none;
     }
-    .submit-btn:hover { background: #fff; box-shadow: 0 0 40px rgba(0,200,255,0.6); }
-    .submit-btn:hover::before { transform: translateX(100%); }
-    .submit-btn:active { transform: scale(0.97); }
-
-    .submit-note {
-      margin-top: 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      letter-spacing: 0.1em;
+    .section:hover::after {
+      animation: sweepLight 0.6s ease forwards;
+    }
+    @keyframes sweepLight {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(100%); }
     }
 
-    /* ── Success screen ── */
-    .success-screen {
-      display: none;
-      text-align: center;
-      padding: 80px 20px;
-      animation: fadeUp 0.7s ease both;
-    }
-    .success-screen.show { display: block; }
-    .success-icon { font-size: 3rem; margin-bottom: 20px; }
-    .success-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      color: var(--success);
-      text-shadow: 0 0 20px rgba(0,255,136,0.4);
-      margin-bottom: 12px;
-    }
-    .success-msg {
+    .section-tag {
+      position: absolute; top: -1px; right: 12px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      line-height: 1.8;
+      font-size: 0.6rem; color: var(--text-dim);
+      letter-spacing: 0.16em;
+      background: #0d1e2e; /* solid, for readability over bg */
+      padding: 2px 8px;
+      border: 1px solid var(--border); border-top: none;
     }
 
-    /* ── Depth meter decoration ── */
-    .depth-meter {
-      position: fixed;
-      right: 20px; top: 50%;
-      transform: translateY(-50%);
-      z-index: 3;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      opacity: 0.35;
-    }
-    @media (max-width: 900px) { .depth-meter { display: none; } }
-    .depth-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      writing-mode: vertical-rl;
-      margin-bottom: 6px;
-    }
-    .depth-track {
-      width: 2px; height: 200px;
-      background: var(--border);
-      position: relative;
-    }
-    .depth-fill {
-      position: absolute; bottom: 0; left: 0; width: 100%;
-      background: var(--accent);
-      box-shadow: var(--glow);
-      transition: height 0.4s ease;
-    }
-    .depth-val {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.58rem;
-      color: var(--accent);
-      margin-top: 4px;
-    }
+    .section:nth-child(1){animation-delay:.1s}.section:nth-child(2){animation-delay:.18s}
+    .section:nth-child(3){animation-delay:.26s}.section:nth-child(4){animation-delay:.34s}
+    .section:nth-child(5){animation-delay:.42s}.section:nth-child(6){animation-delay:.5s}
+    .section:nth-child(7){animation-delay:.58s}.section:nth-child(8){animation-delay:.66s}
+    .section:nth-child(9){animation-delay:.74s}
 
-    /* stagger animations */
-    .form-section:nth-child(1) { animation-delay: 0.1s; }
-    .form-section:nth-child(2) { animation-delay: 0.18s; }
-    .form-section:nth-child(3) { animation-delay: 0.26s; }
-    .form-section:nth-child(4) { animation-delay: 0.34s; }
-    .form-section:nth-child(5) { animation-delay: 0.42s; }
-    .form-section:nth-child(6) { animation-delay: 0.5s; }
-    .form-section:nth-child(7) { animation-delay: 0.58s; }
-    .form-section:nth-child(8) { animation-delay: 0.66s; }
-    .form-section:nth-child(9) { animation-delay: 0.74s; }
+    label.field-label { display:block; font-family:'Orbitron',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; color:var(--accent); text-transform:uppercase; margin-bottom:7px; }
+    .field-hint { font-family:'Exo 2',sans-serif; font-size:0.78rem; color:var(--text-dim); font-style:italic; letter-spacing:0.03em; margin-bottom:10px; display:block; }
 
-    /* Error state */
-    input.error, textarea.error, select.error {
-      border-color: var(--accent2) !important;
-      box-shadow: 0 0 8px rgba(255,107,53,0.4) !important;
+    input[type="text"], input[type="number"], textarea, select {
+      width:100%; background:rgba(4,10,16,0.75); border:1px solid var(--border);
+      color:var(--text-bright); font-family:'Share Tech Mono',monospace; font-size:0.86rem;
+      padding:10px 12px; outline:none;
+      transition:border-color 0.2s,box-shadow 0.2s,background 0.2s; -webkit-appearance:none;
     }
-    .error-msg {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent2);
-      margin-top: 6px;
-      display: none;
+    input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+      border-color:var(--accent-dim); box-shadow:0 0 0 1px var(--accent-dim),inset 0 0 12px rgba(138,173,90,0.04); background:rgba(4,10,16,0.9);
     }
-    .error-msg.show { display: block; }
+    input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder { color:var(--text-dim); font-style:italic; }
+    textarea { resize:vertical; min-height:80px; line-height:1.6; }
+    select { cursor:pointer; } select option { background:#0d1e2e; }
+
+    .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:520px){.row-2{grid-template-columns:1fr}}
+
+    /* Role cards */
+    .roles-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    @media(max-width:520px){.roles-grid{grid-template-columns:repeat(2,1fr)}}
+    .role-card { border:1px solid var(--border); background:rgba(4,10,16,0.6); padding:14px 8px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; user-select:none; }
+    .role-card input[type="radio"] { display:none; }
+    .role-card:hover { border-color:var(--border2); background:rgba(17,34,51,0.8); }
+    .role-card.selected { border-color:var(--accent); background:rgba(138,173,90,0.1); box-shadow:var(--glow-g); }
+    .role-card.selected .role-name { color:var(--accent); }
+    .role-icon  { font-size:1.4rem; display:block; margin-bottom:6px; }
+    .role-name  { font-family:'Orbitron',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); transition:color 0.2s; }
+    .role-check { position:absolute; top:4px; right:5px; font-size:0.55rem; color:var(--accent); opacity:0; transition:opacity 0.2s; }
+    .role-card.selected .role-check { opacity:1; }
+
+    /* Clown */
+    .clown-row { display:flex; gap:10px; }
+    .clown-btn { flex:1; padding:12px; border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:0.78rem; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+    .clown-btn:hover { border-color:var(--border2); color:var(--text); }
+    .clown-btn.no-active  { border-color:var(--success); color:var(--success); background:rgba(106,170,58,0.08); box-shadow:0 0 10px rgba(106,170,58,0.2); }
+    .clown-btn.yes-active { border-color:var(--danger2); color:var(--danger2); background:rgba(122,32,32,0.12); box-shadow:0 0 10px rgba(196,48,48,0.25); }
+
+    /* Availability */
+    .avail-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+    .avail-item { display:flex; align-items:center; gap:9px; cursor:pointer; padding:7px 10px; border:1px solid transparent; transition:all 0.2s; }
+    .avail-item:hover { border-color:var(--border); background:rgba(138,173,90,0.03); }
+    .avail-item input { display:none; }
+    .avail-box { width:14px; height:14px; min-width:14px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.55rem; color:transparent; transition:all 0.2s; }
+    .avail-item input:checked ~ .avail-box { border-color:var(--accent); background:var(--accent); color:var(--bg); }
+    .avail-label { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--text-dim); transition:color 0.2s; }
+    .avail-item:has(input:checked) .avail-label { color:var(--text-bright); }
+
+    /* Salary */
+    .slider-row { display:flex; align-items:center; gap:14px; }
+    input[type="range"] { flex:1; -webkit-appearance:none; height:3px; background:var(--border); border:none; outline:none; cursor:pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; background:var(--accent); border-radius:50%; box-shadow:var(--glow-g); cursor:pointer; transition:transform 0.15s; }
+    input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.25); }
+    .salary-display { font-family:'Orbitron',monospace; font-size:1rem; color:var(--accent); min-width:48px; text-align:right; }
+
+    /* Submit */
+    .submit-zone { text-align:center; margin-top:34px; }
+    .submit-btn {
+      font-family:'Orbitron',sans-serif; font-weight:700; font-size:0.8rem; letter-spacing:0.24em; text-transform:uppercase;
+      color:var(--bg); background:var(--accent); border:none; padding:16px 60px; cursor:pointer;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+      transition:all 0.2s; position:relative; overflow:hidden;
+    }
+    .submit-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent); transform:translateX(-100%); transition:none; }
+    .submit-btn:hover { background:var(--text-bright); box-shadow:0 0 40px rgba(138,173,90,0.5); }
+    .submit-btn:hover::before { animation:shimmer 0.5s ease forwards; }
+    @keyframes shimmer { to{transform:translateX(100%)} }
+    .submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .submit-note { margin-top:12px; font-family:'Share Tech Mono',monospace; font-size:0.64rem; color:var(--text-dim); letter-spacing:0.12em; }
+
+    /* Errors */
+    input.err, textarea.err { border-color:var(--danger2)!important; box-shadow:0 0 6px rgba(196,48,48,0.3)!important; }
+    .err-msg { font-family:'Share Tech Mono',monospace; font-size:0.66rem; color:var(--danger2); margin-top:5px; display:none; }
+    .err-msg.show { display:block; }
+
+    /* Success */
+    #successScreen { display:none; text-align:center; padding:90px 20px; position:relative; z-index:10; animation:slideUp 0.7s ease both; }
+    #successScreen.show { display:block; }
+    .success-icon  { font-size:2.6rem; margin-bottom:16px; }
+    .success-title { font-family:'Orbitron',sans-serif; font-size:1.3rem; color:var(--success); text-shadow:0 0 20px rgba(106,170,58,0.4); margin-bottom:10px; letter-spacing:0.1em; }
+    .success-body  { font-family:'Share Tech Mono',monospace; font-size:0.76rem; color:var(--text-dim); line-height:2; }
+    .success-body span { color:var(--accent); }
   </style>
 </head>
 <body>
 
-<!-- Bubbles -->
+<!-- Background layers -->
+<div class="bg-image" id="bgImage"></div>
+<div class="bg-overlay"></div>
+<div class="bg-red"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
 <div class="bubbles" id="bubbles"></div>
 
-<!-- Depth meter -->
 <div class="depth-meter">
-  <span class="depth-label">DEPTH</span>
-  <div class="depth-track"><div class="depth-fill" id="depthFill" style="height:0%"></div></div>
-  <span class="depth-val" id="depthVal">0m</span>
+  <span class="dm-label">DEPTH</span>
+  <div class="dm-track"><div class="dm-fill" id="dmFill" style="height:0%"></div></div>
+  <span class="dm-val" id="dmVal">0m</span>
 </div>
 
-<div class="page">
+<div class="sonar">
+  <svg viewBox="0 0 110 110" fill="none">
+    <circle cx="55" cy="55" r="50" stroke="#8aad5a" stroke-width="0.8"/>
+    <circle cx="55" cy="55" r="34" stroke="#8aad5a" stroke-width="0.5" opacity="0.5"/>
+    <circle cx="55" cy="55" r="18" stroke="#8aad5a" stroke-width="0.5" opacity="0.35"/>
+    <circle cx="55" cy="55" r="50" stroke="#8aad5a" stroke-width="0.4" opacity="0.4" class="sonar-ping"/>
+    <line x1="55" y1="55" x2="55" y2="5" stroke="#8aad5a" stroke-width="1.2" class="sonar-sweep"/>
+    <circle cx="55" cy="55" r="2.5" fill="#8aad5a"/>
+    <circle cx="74" cy="36" r="1.8" fill="#8aad5a" opacity="0.5"/>
+    <circle cx="32" cy="68" r="1.4" fill="#8aad5a" opacity="0.35"/>
+  </svg>
+</div>
+
+<div class="page page-breathe">
   <header>
-    <div class="corp-badge">Europacorp — Crew Requisition Division</div>
-    <h1>CREW<br/><span>APPLICATION</span></h1>
-    <p class="subtitle">// SUBMARINE OPERATIONS — CLASSIFIED DEPTH //</p>
-    <div class="depth-bar"></div>
+    <div class="corp-tag">EuropaCorp — Crew Requisition Division</div>
+    <h1 data-text="CREW&#10;APPLICATION">CREW<br/><em>APPLICATION</em></h1>
+    <div class="subtitle-wrap">
+      <span class="subtitle">// SUBMARINE OPERATIONS — CLASSIFIED DEPTH //</span>
+    </div>
+    <div class="header-rule"></div>
   </header>
 
-  <div class="warning-strip">
-    All personnel must complete this form prior to boarding. Incomplete or falsified applications will result in immediate ejection from the airlock.
+  <div class="warn-strip">
+    All personnel must complete this form prior to boarding. Incomplete or falsified applications will result in immediate ejection from the airlock. Clown affiliation must be disclosed under Section 14 of the EuropaCorp Employee Conduct Charter.
   </div>
 
   <form id="appForm" novalidate>
 
-    <!-- 1 & 2: Name + Age in one row -->
-    <div class="form-section row-2" data-index="FIELD 01–02">
+    <div class="section row-2">
+      <span class="section-tag">FIELD 01–02</span>
       <div>
-        <label for="name">Name / Surname</label>
-        <input type="text" id="name" placeholder="e.g. John Doe" autocomplete="off"/>
-        <span class="error-msg" id="nameErr">Name is required.</span>
+        <label class="field-label" for="f-name">Name / Surname</label>
+        <input type="text" id="f-name" placeholder="e.g. John Doe" autocomplete="off"/>
+        <span class="err-msg" id="e-name">Name is required.</span>
       </div>
       <div>
-        <label for="age">Age</label>
-        <input type="number" id="age" placeholder="18" min="16" max="99"/>
-        <span class="error-msg" id="ageErr">Please enter a valid age.</span>
+        <label class="field-label" for="f-age">Age</label>
+        <input type="number" id="f-age" placeholder="18" min="16" max="99"/>
+        <span class="err-msg" id="e-age">Valid age required (16–99).</span>
       </div>
     </div>
 
-    <!-- 3: Role -->
-    <div class="form-section" data-index="FIELD 03">
-      <label>Desired Job Role</label>
-      <span class="field-hint">Select the position you are applying for aboard the vessel.</span>
+    <div class="section">
+      <span class="section-tag">FIELD 03</span>
+      <label class="field-label">Desired Job Role</label>
+      <span class="field-hint">Select the position you are applying for aboard the vessel. Choose carefully.</span>
       <div class="roles-grid">
-        <label class="role-card" id="card-captain">
-          <input type="radio" name="role" value="Captain"/>
-          <span class="role-icon">🎖️</span>
-          <span class="role-name">Captain</span>
-          <span class="role-check">✔</span>
-        </label>
-        <label class="role-card" id="card-medic">
-          <input type="radio" name="role" value="Medic"/>
-          <span class="role-icon">⚕️</span>
-          <span class="role-name">Medic</span>
-          <span class="role-check">✔</span>
-        </label>
-        <label class="role-card" id="card-engineer">
-          <input type="radio" name="role" value="Engineer"/>
-          <span class="role-icon">⚙️</span>
-          <span class="role-name">Engineer</span>
-          <span class="role-check">✔</span>
-        </label>
-        <label class="role-card" id="card-mechanic">
-          <input type="radio" name="role" value="Mechanic"/>
-          <span class="role-icon">🔧</span>
-          <span class="role-name">Mechanic</span>
-          <span class="role-check">✔</span>
-        </label>
-        <label class="role-card" id="card-security">
-          <input type="radio" name="role" value="Security"/>
-          <span class="role-icon">🛡️</span>
-          <span class="role-name">Security</span>
-          <span class="role-check">✔</span>
-        </label>
-        <label class="role-card" id="card-assistant">
-          <input type="radio" name="role" value="Assistant"/>
-          <span class="role-icon">🪣</span>
-          <span class="role-name">Assistant</span>
-          <span class="role-check">✔</span>
-        </label>
+        <label class="role-card"><input type="radio" name="role" value="Captain"/><span class="role-icon">🎖️</span><span class="role-name">Captain</span><span class="role-check">✔</span></label>
+        <label class="role-card"><input type="radio" name="role" value="Medic"/><span class="role-icon">⚕️</span><span class="role-name">Medic</span><span class="role-check">✔</span></label>
+        <label class="role-card"><input type="radio" name="role" value="Engineer"/><span class="role-icon">⚙️</span><span class="role-name">Engineer</span><span class="role-check">✔</span></label>
+        <label class="role-card"><input type="radio" name="role" value="Mechanic"/><span class="role-icon">🔧</span><span class="role-name">Mechanic</span><span class="role-check">✔</span></label>
+        <label class="role-card"><input type="radio" name="role" value="Security"/><span class="role-icon">🛡️</span><span class="role-name">Security</span><span class="role-check">✔</span></label>
+        <label class="role-card"><input type="radio" name="role" value="Assistant"/><span class="role-icon">🪣</span><span class="role-name">Assistant</span><span class="role-check">✔</span></label>
       </div>
-      <span class="error-msg" id="roleErr">Please select a role.</span>
+      <span class="err-msg" id="e-role">Please select a role.</span>
     </div>
 
-    <!-- 4: Experience -->
-    <div class="form-section" data-index="FIELD 04">
-      <label for="experience">Previous Experience</label>
+    <div class="section">
+      <span class="section-tag">FIELD 04</span>
+      <label class="field-label" for="f-exp">Previous Experience</label>
       <span class="field-hint">Relevant skills, prior expeditions, certifications. Be honest — we'll find out either way.</span>
-      <textarea id="experience" placeholder="Describe your experience aboard Europa's submarines or on the surface colonies..."></textarea>
+      <textarea id="f-exp" placeholder="Describe your experience aboard Europa's submarines or surface colonies..."></textarea>
     </div>
 
-    <!-- 5 & 6: Likes / Dislikes -->
-    <div class="form-section row-2" data-index="FIELD 05–06">
+    <div class="section row-2">
+      <span class="section-tag">FIELD 05–06</span>
       <div>
-        <label for="likes">What You Like</label>
+        <label class="field-label" for="f-likes">What You Like</label>
         <span class="field-hint">In gameplay, teamwork, or general.</span>
-        <textarea id="likes" placeholder="e.g. coordinated teamwork, fixing reactor..."></textarea>
+        <textarea id="f-likes" placeholder="e.g. coordinated teamwork, fixing reactor..."></textarea>
       </div>
       <div>
-        <label for="dislikes">What You Don't Like</label>
+        <label class="field-label" for="f-dislikes">What You Don't Like</label>
         <span class="field-hint">We won't hold it against you. Mostly.</span>
-        <textarea id="dislikes" placeholder="e.g. chaos, being left alone with a clown..."></textarea>
+        <textarea id="f-dislikes" placeholder="e.g. chaos, clowns, the void..."></textarea>
       </div>
     </div>
 
-    <!-- 7: Clown -->
-    <div class="form-section" data-index="FIELD 07">
-      <label>History with the Clown Gang?</label>
-      <span class="field-hint">Any prior affiliation, accidental incitement, or "incidents" must be disclosed.</span>
-      <div class="clown-options">
-        <button type="button" class="clown-btn" id="clownNo"  onclick="setClown('no')">🟢 &nbsp;No Affiliation</button>
-        <button type="button" class="clown-btn" id="clownYes" onclick="setClown('yes')">🤡 &nbsp;I Plead the Fifth</button>
+    <div class="section">
+      <span class="section-tag">FIELD 07</span>
+      <label class="field-label">History with the Clown Gang?</label>
+      <span class="field-hint">Any prior affiliation, accidental incitement, or documented "incidents" must be declared.</span>
+      <div class="clown-row">
+        <button type="button" class="clown-btn" id="btn-no"  onclick="setClown('no')">🟢 &nbsp;No Affiliation</button>
+        <button type="button" class="clown-btn" id="btn-yes" onclick="setClown('yes')">🤡 &nbsp;I Plead the Fifth</button>
       </div>
-      <input type="hidden" id="clown" value=""/>
-      <span class="error-msg" id="clownErr">This field is mandatory. We know why.</span>
+      <input type="hidden" id="f-clown" value=""/>
+      <span class="err-msg" id="e-clown">Disclosure is mandatory. Section 14 applies.</span>
     </div>
 
-    <!-- 8: Availability -->
-    <div class="form-section" data-index="FIELD 08">
-      <label>Availability</label>
+    <div class="section">
+      <span class="section-tag">FIELD 08</span>
+      <label class="field-label">Availability</label>
       <span class="field-hint">Select all that apply. Missions depart at Europa's discretion.</span>
       <div class="avail-grid">
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="Weekday Evenings"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">Weekday Evenings</span>
-        </label>
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="Weekday Daytime"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">Weekday Daytime</span>
-        </label>
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="Weekend Daytime"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">Weekend Daytime</span>
-        </label>
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="Weekend Evenings"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">Weekend Evenings</span>
-        </label>
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="Flexible"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">Fully Flexible</span>
-        </label>
-        <label class="avail-item">
-          <input type="checkbox" name="avail" value="On-Call"/>
-          <span class="avail-box">✔</span>
-          <span class="avail-label">On-Call / Emergency</span>
-        </label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="Weekday Evenings"/><span class="avail-box">✔</span><span class="avail-label">Weekday Evenings</span></label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="Weekday Daytime"/><span class="avail-box">✔</span><span class="avail-label">Weekday Daytime</span></label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="Weekend Daytime"/><span class="avail-box">✔</span><span class="avail-label">Weekend Daytime</span></label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="Weekend Evenings"/><span class="avail-box">✔</span><span class="avail-label">Weekend Evenings</span></label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="Flexible"/><span class="avail-box">✔</span><span class="avail-label">Fully Flexible</span></label>
+        <label class="avail-item"><input type="checkbox" name="avail" value="On-Call"/><span class="avail-box">✔</span><span class="avail-label">On-Call / Emergency</span></label>
       </div>
     </div>
 
-    <!-- 9: Salary -->
-    <div class="form-section" data-index="FIELD 09">
-      <label>Salary Expectations</label>
+    <div class="section">
+      <span class="section-tag">FIELD 09</span>
+      <label class="field-label">Salary Expectations</label>
       <span class="field-hint">In % of mission loot. The submarine needs fuel too, you know.</span>
-      <div class="slider-wrap">
-        <input type="range" id="salary" min="0" max="50" value="15" step="1"
-          oninput="updateSalary(this.value)"/>
-        <span class="salary-val" id="salaryVal">15%</span>
+      <div class="slider-row">
+        <input type="range" id="f-salary" min="0" max="50" value="15" step="1" oninput="updateSalary(this.value)"/>
+        <span class="salary-display" id="salary-val">15%</span>
       </div>
     </div>
 
-    <!-- 10: Suggestions -->
-    <div class="form-section" data-index="FIELD 10">
-      <label for="suggestions">Open Suggestions</label>
-      <span class="field-hint">Anything else command should know. Grievances, requests, threats.</span>
-      <textarea id="suggestions" placeholder="Optional. This field is monitored."></textarea>
+    <div class="section">
+      <span class="section-tag">FIELD 10</span>
+      <label class="field-label" for="f-suggestions">Open Suggestions</label>
+      <span class="field-hint">Anything else command should know. Grievances, requests, or threats.</span>
+      <textarea id="f-suggestions" placeholder="Optional. This field is monitored."></textarea>
     </div>
 
-    <!-- Submit -->
     <div class="submit-zone">
-      <button type="submit" class="submit-btn">SUBMIT APPLICATION</button>
-      <p class="submit-note">// Transmission encrypted — EuropaNet relay //</p>
+      <button type="submit" class="submit-btn" id="submitBtn">SUBMIT APPLICATION</button>
+      <p class="submit-note">// Transmission encrypted — EuropaNet relay — All data logged //</p>
     </div>
 
   </form>
 
-  <!-- Success -->
-  <div class="success-screen" id="successScreen">
+  <div id="successScreen">
     <div class="success-icon">📡</div>
     <h2 class="success-title">APPLICATION RECEIVED</h2>
-    <p class="success-msg">
+    <p class="success-body">
       Your file has been transmitted to command.<br/>
       Screening will be conducted at depth.<br/>
       Do not contact us. We will find you.<br/><br/>
-      <span style="color: var(--accent);">— EuropaCorp Crew Requisition Division</span>
+      <span>— EuropaCorp Crew Requisition Division</span>
     </p>
   </div>
 </div>
 
 <script>
-  // ── Bubbles ──
-  const container = document.getElementById('bubbles');
-  for (let i = 0; i < 18; i++) {
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    const size = 10 + Math.random() * 40;
-    b.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      animation-duration:${10+Math.random()*20}s;
-      animation-delay:${Math.random()*15}s;
-    `;
-    container.appendChild(b);
-  }
+// ═══════════ PARALLAX BACKGROUND ═══════════
+document.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth  - 0.5) * 18;
+  const y = (e.clientY / window.innerHeight - 0.5) * 10;
+  document.getElementById('bgImage').style.transform =
+    `scale(1.12) translate(${x}px, ${y}px)`;
+});
 
-  // ── Salary slider ──
-  function updateSalary(v) {
-    document.getElementById('salaryVal').textContent = v + '%';
-    const slider = document.getElementById('salary');
-    const pct = (v / 50) * 100;
-    slider.style.background = `linear-gradient(90deg, var(--accent) ${pct}%, var(--border) ${pct}%)`;
-  }
-  updateSalary(15);
+// ═══════════ BUBBLES ═══════════
+const bc = document.getElementById('bubbles');
+for (let i = 0; i < 18; i++) {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const sz = 6 + Math.random() * 30;
+  b.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${14+Math.random()*24}s;animation-delay:${Math.random()*20}s;`;
+  bc.appendChild(b);
+}
 
-  // ── Role cards ──
-  document.querySelectorAll('.role-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
+// ═══════════ SCROLL ═══════════
+window.addEventListener('scroll', () => {
+  const pct = Math.min(100, (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+  document.getElementById('progressFill').style.height = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('dmFill').style.height = pct + '%';
+  document.getElementById('dmVal').textContent = Math.round(pct * 4) + 'm';
+  // Subtle parallax on scroll too
+  const bg = document.getElementById('bgImage');
+  const scrollShift = (window.scrollY / document.body.scrollHeight) * 30;
+  bg.style.backgroundPositionY = `calc(30% + ${scrollShift}px)`;
+});
+
+// ═══════════ SALARY ═══════════
+function updateSalary(v) {
+  document.getElementById('salary-val').textContent = v + '%';
+  const s = document.getElementById('f-salary');
+  s.style.background = `linear-gradient(90deg, #8aad5a ${v*2}%, #1e3a50 ${v*2}%)`;
+}
+updateSalary(15);
+
+// ═══════════ ROLE CARDS ═══════════
+document.querySelectorAll('.role-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+});
+
+// ═══════════ CLOWN ═══════════
+function setClown(v) {
+  document.getElementById('f-clown').value = v;
+  document.getElementById('btn-no').classList.toggle('no-active', v === 'no');
+  document.getElementById('btn-yes').classList.toggle('yes-active', v === 'yes');
+  document.getElementById('e-clown').classList.remove('show');
+}
+
+// ═══════════ SCROLL REVEAL (Intersection Observer) ═══════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.section').forEach(s => {
+  s.style.animationPlayState = 'paused';
+  observer.observe(s);
+});
+
+// ═══════════ SUPABASE ═══════════
+const SUPA_URL = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
+
+document.getElementById('appForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  let valid = true;
+
+  const name  = document.getElementById('f-name').value.trim();
+  const age   = document.getElementById('f-age').value;
+  const role  = document.querySelector('input[name="role"]:checked');
+  const clown = document.getElementById('f-clown').value;
+  const avail = [...document.querySelectorAll('input[name="avail"]:checked')].map(c => c.value);
+
+  const check = (id, errId, bad) => {
+    document.getElementById(id).classList.toggle('err', bad);
+    document.getElementById(errId).classList.toggle('show', bad);
+    if (bad) valid = false;
+  };
+
+  check('f-name', 'e-name', !name);
+  check('f-age',  'e-age',  !age || age < 16 || age > 99);
+  if (!role)  { document.getElementById('e-role').classList.add('show');  valid = false; }
+  else        { document.getElementById('e-role').classList.remove('show'); }
+  if (!clown) { document.getElementById('e-clown').classList.add('show'); valid = false; }
+  else        { document.getElementById('e-clown').classList.remove('show'); }
+
+  if (!valid) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'TRANSMITTING...';
+
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/applications`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':SUPA_KEY, 'Authorization':`Bearer ${SUPA_KEY}`, 'Prefer':'return=minimal' },
+      body: JSON.stringify({
+        name, age: parseInt(age), role: role.value,
+        experience:  document.getElementById('f-exp').value.trim(),
+        likes:       document.getElementById('f-likes').value.trim(),
+        dislikes:    document.getElementById('f-dislikes').value.trim(),
+        clown_history: clown,
+        availability:  avail.join(', '),
+        salary_pct:    parseInt(document.getElementById('f-salary').value),
+        suggestions:   document.getElementById('f-suggestions').value.trim(),
+        submitted_at:  new Date().toISOString()
+      })
     });
-  });
-
-  // ── Clown buttons ──
-  let clownVal = '';
-  function setClown(v) {
-    clownVal = v;
-    document.getElementById('clown').value = v;
-    document.getElementById('clownNo').classList.toggle('active-no', v === 'no');
-    document.getElementById('clownYes').classList.toggle('active-yes', v === 'yes');
-    document.getElementById('clownErr').classList.remove('show');
+    if (!res.ok) throw new Error(await res.text());
+    document.getElementById('appForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(err) {
+    console.error(err);
+    btn.textContent = 'SUBMIT APPLICATION'; btn.disabled = false;
+    alert('⚠ Transmission failed. Check connection and try again.');
   }
-
-  // ── Depth meter (scroll-based) ──
-  window.addEventListener('scroll', () => {
-    const scrolled = window.scrollY;
-    const total = document.body.scrollHeight - window.innerHeight;
-    const pct = Math.min(100, (scrolled / total) * 100);
-    document.getElementById('depthFill').style.height = pct + '%';
-    document.getElementById('depthVal').textContent = Math.round(pct * 4) + 'm';
-  });
-
-  // ── Validation & Submit ──
-  document.getElementById('appForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    let valid = true;
-
-    const name = document.getElementById('name').value.trim();
-    const age  = document.getElementById('age').value;
-    const role = document.querySelector('input[name="role"]:checked');
-    const clown = document.getElementById('clown').value;
-    const avail = [...document.querySelectorAll('input[name="avail"]:checked')].map(c => c.value);
-
-    // Name
-    if (!name) {
-      document.getElementById('name').classList.add('error');
-      document.getElementById('nameErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('name').classList.remove('error');
-      document.getElementById('nameErr').classList.remove('show');
-    }
-
-    // Age
-    if (!age || age < 16 || age > 99) {
-      document.getElementById('age').classList.add('error');
-      document.getElementById('ageErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('age').classList.remove('error');
-      document.getElementById('ageErr').classList.remove('show');
-    }
-
-    // Role
-    if (!role) {
-      document.getElementById('roleErr').classList.add('show');
-      valid = false;
-    } else {
-      document.getElementById('roleErr').classList.remove('show');
-    }
-
-    // Clown
-    if (!clown) {
-      document.getElementById('clownErr').classList.add('show');
-      valid = false;
-    }
-
-    if (!valid) return;
-
-    // ── Collect data ──
-    const payload = {
-      name,
-      age: parseInt(age),
-      role: role.value,
-      experience: document.getElementById('experience').value.trim(),
-      likes:       document.getElementById('likes').value.trim(),
-      dislikes:    document.getElementById('dislikes').value.trim(),
-      clown_history: clown,
-      availability:  avail.join(', '),
-      salary_pct:    parseInt(document.getElementById('salary').value),
-      suggestions:   document.getElementById('suggestions').value.trim(),
-      submitted_at:  new Date().toISOString()
-    };
-
-    const SUPABASE_URL = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
-
-    // Disable button while sending
-    const btn = document.querySelector('.submit-btn');
-    btn.textContent = 'TRANSMITTING...';
-    btn.disabled = true;
-
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/applications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
-      }
-
-      // Show success
-      document.getElementById('appForm').style.display = 'none';
-      document.getElementById('successScreen').classList.add('show');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    } catch (err) {
-      console.error('Submission error:', err);
-      btn.textContent = 'SUBMIT APPLICATION';
-      btn.disabled = false;
-      alert('⚠ Transmission failed. Check your connection and try again.');
-    }
-  });
+});
 </script>
 </body>
 </html>
