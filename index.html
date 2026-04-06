@@ -582,51 +582,6 @@ If you are reading this notice and still considering applying — welcome. You'r
     </div>
 
     <div class="section">
-      <span class="section-tag">ASSESSMENT 02</span>
-      <span class="game-section-label">🔧 Practical Skills Assessment — Damage Control</span>
-      <label class="field-label">Hull Breach Repair</label>
-      <span class="field-hint">Three hull breaches detected. Click each leak to patch it before the timer runs out. We are at depth. This is not a drill. It is also not NOT a drill.</span>
-      <div class="game-wrap">
-        <div class="hull-timer-bar"><div class="hull-timer-fill" id="hullTimerFill"></div></div>
-        <div class="hull-game">
-          <svg id="hullSvg" class="hull-svg" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
-            <!-- Submarine hull outline -->
-            <ellipse cx="250" cy="80" rx="220" ry="55" fill="none" stroke="#1e3a50" stroke-width="3"/>
-            <ellipse cx="250" cy="80" rx="215" ry="50" fill="rgba(9,20,32,0.8)" stroke="#2a4e68" stroke-width="1"/>
-            <!-- Conning tower -->
-            <rect x="200" y="28" width="80" height="30" rx="4" fill="rgba(9,20,32,0.9)" stroke="#1e3a50" stroke-width="2"/>
-            <!-- Periscope -->
-            <line x1="240" y1="28" x2="240" y2="10" stroke="#1e3a50" stroke-width="3"/>
-            <rect x="234" y="6" width="12" height="6" rx="2" fill="#2a4e68"/>
-            <!-- Propeller -->
-            <circle cx="468" cy="80" r="14" fill="none" stroke="#1e3a50" stroke-width="2"/>
-            <line x1="468" y1="66" x2="468" y2="94" stroke="#1e3a50" stroke-width="2"/>
-            <line x1="454" y1="80" x2="482" y2="80" stroke="#1e3a50" stroke-width="2"/>
-            <!-- Windows -->
-            <circle cx="160" cy="80" r="8" fill="none" stroke="#2a4e68" stroke-width="1.5" opacity="0.6"/>
-            <circle cx="290" cy="80" r="8" fill="none" stroke="#2a4e68" stroke-width="1.5" opacity="0.6"/>
-            <!-- LEAK SPOTS -->
-            <g class="leak-spot" id="leak0" onclick="patchLeak(0)">
-              <circle cx="140" cy="100" r="10" fill="#3070c4" opacity="0.8"/>
-              <text x="140" y="105" text-anchor="middle" font-size="10" fill="white">💧</text>
-            </g>
-            <g class="leak-spot" id="leak1" onclick="patchLeak(1)">
-              <circle cx="310" cy="60" r="10" fill="#3070c4" opacity="0.8"/>
-              <text x="310" y="65" text-anchor="middle" font-size="10" fill="white">💧</text>
-            </g>
-            <g class="leak-spot" id="leak2" onclick="patchLeak(2)">
-              <circle cx="390" cy="95" r="10" fill="#3070c4" opacity="0.8"/>
-              <text x="390" y="100" text-anchor="middle" font-size="10" fill="white">💧</text>
-            </g>
-          </svg>
-        </div>
-        <div class="game-msg" id="hullMsg">3 leaks detected. Patch them all!</div>
-        <button type="button" class="game-retry" onclick="startHullGame()" style="display:block;margin:8px auto 0;" id="hullStartBtn">▶ Start Timer</button>
-      </div>
-      <input type="hidden" id="f-hull-game" value="not attempted"/>
-    </div>
-
-    <div class="section">
       <span class="section-tag">ASSESSMENT 03</span>
       <span class="game-section-label">💊 Medical Competency — Pharmaceutical Identification</span>
       <label class="field-label">Identify the Morphine</label>
@@ -1055,305 +1010,238 @@ function setToggle(hiddenId, val, btnYesId, btnNoId) {
   document.getElementById(btnNoId).classList.toggle('no-active',  val === 'no');
 }
 
-// ═══════════ GAME 1: CABLES ═══════════
-let selectedLeft = null;
-let connections = {}; // leftColor -> rightColor
 
-function selectCablePort(el) {
-  if (el.classList.contains('connected')) return;
-  document.querySelectorAll('.left-port').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedLeft = el;
-  document.getElementById('cableMsg').textContent = 'Now click the matching right port.';
-  document.getElementById('cableMsg').className = 'game-msg info';
-}
+// ═══════════════════════════════════════════
+// GAMES — init after DOM ready
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
 
-function connectCablePort(el) {
-  if (!selectedLeft) { document.getElementById('cableMsg').textContent = 'Select a left port first.'; return; }
-  const lColor = selectedLeft.dataset.color;
-  const rColor = el.dataset.color;
-  connections[lColor] = rColor;
-  drawCableLines();
-  selectedLeft.classList.remove('selected');
-  selectedLeft = null;
-  checkCables();
-}
+  // ── GAME 1: CABLE CONNECT ──
+  let selLeft = null;
+  const cxns  = {}; // leftColor -> rightColor
 
-function drawCableLines() {
-  const canvas = document.getElementById('cableCanvas');
-  const ctx = canvas.getContext('2d');
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function colorHex(c) {
+    return {red:'#c43030',blue:'#3070c4',green:'#4caf72',yellow:'#d4a843'}[c] || '#888';
+  }
 
-  const colorMap = {red:'#c43030',blue:'#3070c4',green:'#4caf72',yellow:'#d4a843'};
-  const leftPorts = document.querySelectorAll('.left-port');
-  const rightPorts = document.querySelectorAll('.right-port');
-
-  Object.entries(connections).forEach(([lColor, rColor]) => {
-    let lEl = null, rEl = null;
-    leftPorts.forEach(p => { if (p.dataset.color === lColor) lEl = p; });
-    rightPorts.forEach(p => { if (p.dataset.color === rColor) rEl = p; });
-    if (!lEl || !rEl) return;
-
-    const lRect = lEl.querySelector('.port-dot').getBoundingClientRect();
-    const rRect = rEl.querySelector('.port-dot').getBoundingClientRect();
-    const cRect = canvas.getBoundingClientRect();
-
-    const x1 = lRect.left + lRect.width/2 - cRect.left;
-    const y1 = lRect.top  + lRect.height/2 - cRect.top;
-    const x2 = rRect.left + rRect.width/2 - cRect.left;
-    const y2 = rRect.top  + rRect.height/2 - cRect.top;
-
-    const correct = lColor === rColor;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.bezierCurveTo(x1 + (x2-x1)*0.4, y1, x1 + (x2-x1)*0.6, y2, x2, y2);
-    ctx.strokeStyle = correct ? colorMap[lColor] : '#c43030';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = correct ? colorMap[lColor] : '#c43030';
-    ctx.shadowBlur = 6;
-    ctx.stroke();
+  document.querySelectorAll('.left-port').forEach(p => {
+    p.addEventListener('click', function() {
+      if (this.classList.contains('connected')) return;
+      document.querySelectorAll('.left-port').forEach(x => x.classList.remove('selected'));
+      this.classList.add('selected');
+      selLeft = this;
+      setMsg('cableMsg','Click the matching right port.','info');
+    });
   });
-}
 
-function checkCables() {
-  const colors = ['red','blue','green','yellow'];
-  const allConnected = colors.every(c => connections[c]);
-  const allCorrect = colors.every(c => connections[c] === c);
-  if (!allConnected) {
-    const done = Object.keys(connections).length;
-    document.getElementById('cableMsg').textContent = done + '/4 connected.';
-    document.getElementById('cableMsg').className = 'game-msg info';
-    return;
+  document.querySelectorAll('.right-port').forEach(p => {
+    p.addEventListener('click', function() {
+      if (!selLeft) { setMsg('cableMsg','Select a left port first.','info'); return; }
+      const lc = selLeft.dataset.color;
+      const rc = this.dataset.color;
+      cxns[lc] = rc;
+      drawLines();
+      selLeft.classList.remove('selected');
+      selLeft = null;
+      checkCables();
+    });
+  });
+
+  function drawLines() {
+    const canvas = document.getElementById('cableCanvas');
+    if (!canvas) return;
+    canvas.width  = canvas.offsetWidth  || 100;
+    canvas.height = canvas.offsetHeight || 200;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const cr = canvas.getBoundingClientRect();
+    Object.entries(cxns).forEach(([lc, rc]) => {
+      const lEl = document.querySelector('.left-port[data-color="'+lc+'"] .port-dot');
+      const rEl = document.querySelector('.right-port[data-color="'+rc+'"] .port-dot');
+      if (!lEl || !rEl) return;
+      const lr = lEl.getBoundingClientRect();
+      const rr = rEl.getBoundingClientRect();
+      const x1=lr.left+lr.width/2-cr.left, y1=lr.top+lr.height/2-cr.top;
+      const x2=rr.left+rr.width/2-cr.left, y2=rr.top+rr.height/2-cr.top;
+      const ok = lc === rc;
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.bezierCurveTo(x1+(x2-x1)*0.4,y1, x1+(x2-x1)*0.6,y2, x2,y2);
+      ctx.strokeStyle = ok ? colorHex(lc) : '#c43030';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = ok ? colorHex(lc) : '#c43030';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
   }
-  if (allCorrect) {
-    document.getElementById('cableMsg').textContent = '✔ ALL CABLES CORRECT — POWER RESTORED';
-    document.getElementById('cableMsg').className = 'game-msg pass';
-    document.getElementById('f-cables').value = 'PASSED';
-  } else {
-    const correct = colors.filter(c => connections[c] === c).length;
-    document.getElementById('cableMsg').textContent = correct + '/4 correct. Wrong connections shown in red.';
-    document.getElementById('cableMsg').className = 'game-msg fail';
-    document.getElementById('f-cables').value = 'FAILED — ' + correct + '/4 correct';
-  }
-}
 
-function resetCables() {
-  connections = {}; selectedLeft = null;
-  const canvas = document.getElementById('cableCanvas');
-  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-  document.querySelectorAll('.cable-port').forEach(p => p.classList.remove('selected','connected'));
-  document.getElementById('cableMsg').textContent = 'Select a left port to begin.';
-  document.getElementById('cableMsg').className = 'game-msg';
-  document.getElementById('f-cables').value = 'not attempted';
-}
-window.addEventListener('resize', drawCableLines);
-
-// ═══════════ GAME 2: HULL REPAIR ═══════════
-let hullPatched = [false,false,false];
-let hullTimer = null;
-let hullTime = 20;
-
-function startHullGame() {
-  hullPatched = [false,false,false];
-  hullTime = 20;
-  document.getElementById('hullStartBtn').style.display = 'none';
-  document.querySelectorAll('.leak-spot').forEach(l => { l.classList.remove('patched'); l.style.display=''; });
-  document.getElementById('hullMsg').textContent = '3 leaks detected. Patch them all!';
-  document.getElementById('hullMsg').className = 'game-msg info';
-  document.getElementById('f-hull-game').value = 'in progress';
-  document.getElementById('hullTimerFill').style.width = '100%';
-  document.getElementById('hullTimerFill').style.background = 'var(--success)';
-  clearInterval(hullTimer);
-  hullTimer = setInterval(() => {
-    hullTime -= 0.1;
-    const pct = (hullTime / 20) * 100;
-    document.getElementById('hullTimerFill').style.width = pct + '%';
-    if (pct < 40) document.getElementById('hullTimerFill').style.background = 'var(--warn)';
-    if (pct < 20) document.getElementById('hullTimerFill').style.background = 'var(--danger2)';
-    if (hullTime <= 0) {
-      clearInterval(hullTimer);
-      const fixed = hullPatched.filter(Boolean).length;
-      document.getElementById('hullMsg').textContent = '✘ TIME UP — ' + fixed + '/3 patched. The submarine is now wetter.';
-      document.getElementById('hullMsg').className = 'game-msg fail';
-      document.getElementById('f-hull-game').value = 'FAILED — ' + fixed + '/3 patched';
-      document.getElementById('hullStartBtn').style.display = 'block';
-      document.getElementById('hullStartBtn').textContent = '↺ Try Again';
+  function checkCables() {
+    const colors = ['red','blue','green','yellow'];
+    const done = colors.filter(c => cxns[c]).length;
+    if (done < 4) { setMsg('cableMsg', done+'/4 connected — keep going.','info'); return; }
+    const correct = colors.filter(c => cxns[c]===c).length;
+    if (correct === 4) {
+      setMsg('cableMsg','✔ ALL CABLES CORRECT — Power restored. Even Zez could appreciate this.','pass');
+      document.getElementById('f-cables').value = 'PASSED';
+    } else {
+      setMsg('cableMsg', correct+'/4 correct. Wrong connections shown in red. Try again.','fail');
+      document.getElementById('f-cables').value = 'FAILED — '+correct+'/4';
     }
-  }, 100);
-}
-
-function patchLeak(idx) {
-  if (hullTimer === null || hullTime <= 0) return;
-  if (hullPatched[idx]) return;
-  hullPatched[idx] = true;
-  const spot = document.getElementById('leak' + idx);
-  spot.classList.add('patched');
-  spot.querySelector('circle').setAttribute('fill', '#4caf72');
-  spot.querySelector('text').textContent = '✔';
-  const done = hullPatched.filter(Boolean).length;
-  if (done === 3) {
-    clearInterval(hullTimer);
-    const timeLeft = Math.round(hullTime * 10) / 10;
-    document.getElementById('hullMsg').textContent = '✔ ALL LEAKS PATCHED — ' + timeLeft.toFixed(1) + 's remaining. Jager would be almost impressed.';
-    document.getElementById('hullMsg').className = 'game-msg pass';
-    document.getElementById('f-hull-game').value = 'PASSED — ' + timeLeft.toFixed(1) + 's remaining';
-    document.getElementById('hullStartBtn').style.display = 'none';
-  } else {
-    document.getElementById('hullMsg').textContent = done + '/3 patched. Keep going!';
   }
-}
 
-// ═══════════ GAME 3: DRUG ID ═══════════
-function pickDrug(el, correct) {
-  if (document.querySelector('.drug-card.selected-right')) return; // already won
-  if (correct) {
-    el.classList.add('selected-right');
-    document.getElementById('drugMsg').textContent = '✔ CORRECT — That is Morphine. Please use responsibly. Or don't. Sleep didn't.';
-    document.getElementById('drugMsg').className = 'game-msg pass';
-    document.getElementById('f-drug-game').value = 'PASSED';
-    document.querySelectorAll('.drug-card').forEach(c => c.style.pointerEvents = 'none');
-  } else {
-    el.classList.add('selected-wrong');
-    document.getElementById('drugMsg').textContent = '✘ INCORRECT. That is not Morphine. Do not inject that into anyone.';
-    document.getElementById('drugMsg').className = 'game-msg fail';
-    document.getElementById('f-drug-game').value = 'FAILED';
-    setTimeout(() => el.classList.remove('selected-wrong'), 600);
-  }
-}
+  window.resetCables = function() {
+    Object.keys(cxns).forEach(k => delete cxns[k]);
+    selLeft = null;
+    const canvas = document.getElementById('cableCanvas');
+    if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+    document.querySelectorAll('.cable-port').forEach(p => p.classList.remove('selected','connected'));
+    setMsg('cableMsg','Select a left port to begin.','');
+    document.getElementById('f-cables').value = 'not attempted';
+  };
+  window.addEventListener('resize', drawLines);
 
-// ═══════════ GAME 4: REACTOR ═══════════
-let reactorPct = 300;
-let reactorInterval = null;
-let reactorActive = false;
-
-function startReactor() {
-  reactorPct = 300;
-  reactorActive = true;
-  document.getElementById('reactorStartBtn').style.display = 'none';
-  document.querySelectorAll('.reactor-btn').forEach(b => { b.classList.remove('wrong-btn','right-btn'); b.disabled = false; });
-  document.getElementById('reactorMsg').textContent = '⚠ Reactor output critical. Find the shutdown.';
-  document.getElementById('reactorMsg').className = 'game-msg fail';
-  document.getElementById('f-reactor-game').value = 'in progress';
-  clearInterval(reactorInterval);
-  reactorInterval = setInterval(() => {
-    reactorPct += 2;
-    updateReactorGauge();
-    if (reactorPct >= 400) {
-      clearInterval(reactorInterval); reactorActive = false;
-      document.getElementById('reactorMsg').textContent = '☢ MELTDOWN — Reactor at 400%. The submarine is now a very small sun.';
-      document.getElementById('reactorMsg').className = 'game-msg fail';
-      document.getElementById('f-reactor-game').value = 'FAILED — MELTDOWN';
-      document.getElementById('reactorStartBtn').style.display = 'block';
-      document.getElementById('reactorStartBtn').textContent = '↺ Try Again';
+  // ── GAME 2: DRUG ID ──
+  window.pickDrug = function(el, correct) {
+    if (document.querySelector('.drug-card.selected-right')) return;
+    if (correct) {
+      el.classList.add('selected-right');
+      setMsg('drugMsg',"✔ CORRECT — That is Morphine. Use responsibly. Sleep didn't.",'pass');
+      document.getElementById('f-drug-game').value = 'PASSED';
+      document.querySelectorAll('.drug-card').forEach(c => c.style.pointerEvents='none');
+    } else {
+      el.classList.add('selected-wrong');
+      setMsg('drugMsg','✘ Incorrect. Do not inject that into anyone.','fail');
+      document.getElementById('f-drug-game').value = 'FAILED';
+      setTimeout(() => el.classList.remove('selected-wrong'), 600);
     }
-  }, 300);
-}
+  };
 
-function updateReactorGauge() {
-  const pct = Math.min(reactorPct, 400);
-  const ratio = (pct - 300) / 100; // 0 to 1
-  const circumference = 2 * Math.PI * 55;
-  const offset = circumference - (circumference * ratio);
-  document.getElementById('reactorArc').setAttribute('stroke-dashoffset', offset);
-  document.getElementById('reactorPct').textContent = Math.round(pct) + '%';
-  const color = ratio > 0.7 ? '#ff2020' : ratio > 0.4 ? '#c43030' : '#d4a843';
-  document.getElementById('reactorArc').setAttribute('stroke', color);
-  document.getElementById('reactorPct').setAttribute('fill', color);
-}
+  // ── GAME 3: REACTOR ──
+  let rPct = 300, rInterval = null, rActive = false;
+  const rCircum = 2 * Math.PI * 55;
 
-function reactorPress(btn, correct) {
-  if (!reactorActive) return;
-  if (correct) {
-    clearInterval(reactorInterval); reactorActive = false;
-    btn.classList.add('right-btn');
-    document.getElementById('reactorMsg').textContent = '✔ SCRAM ACTIVATED — Reactor shutdown. Good find. Jager is silently relieved.';
-    document.getElementById('reactorMsg').className = 'game-msg pass';
-    document.getElementById('f-reactor-game').value = 'PASSED — ' + Math.round(reactorPct) + '%';
+  function updateGauge() {
+    const ratio = Math.min((rPct-300)/100, 1);
+    const offset = rCircum - rCircum * ratio;
+    const arc = document.getElementById('reactorArc');
+    const pctEl = document.getElementById('reactorPct');
+    if (!arc || !pctEl) return;
+    arc.setAttribute('stroke-dashoffset', offset);
+    pctEl.textContent = Math.round(rPct)+'%';
+    const col = ratio > 0.7 ? '#ff2020' : ratio > 0.35 ? '#c43030' : '#d4a843';
+    arc.setAttribute('stroke', col);
+    pctEl.setAttribute('fill', col);
+  }
+
+  window.startReactor = function() {
+    rPct = 300; rActive = true;
     document.getElementById('reactorStartBtn').style.display = 'none';
-  } else {
-    btn.classList.add('wrong-btn');
-    reactorPct += 15;
-    updateReactorGauge();
-    document.getElementById('reactorMsg').textContent = '✘ Wrong button! Output jumped to ' + Math.round(reactorPct) + '%.';
-    setTimeout(() => btn.classList.remove('wrong-btn'), 500);
-  }
-}
+    document.querySelectorAll('.reactor-btn').forEach(b => { b.classList.remove('wrong-btn','right-btn'); b.disabled = false; });
+    setMsg('reactorMsg','⚠ CRITICAL — Find the shutdown before meltdown.','fail');
+    document.getElementById('f-reactor-game').value = 'in progress';
+    clearInterval(rInterval);
+    rInterval = setInterval(() => {
+      rPct += 1.5;
+      updateGauge();
+      if (rPct >= 400) {
+        clearInterval(rInterval); rActive = false;
+        setMsg('reactorMsg','☢ MELTDOWN — 400% reached. Submarine is a small sun now.','fail');
+        document.getElementById('f-reactor-game').value = 'FAILED — MELTDOWN';
+        document.getElementById('reactorStartBtn').style.display = 'block';
+        document.getElementById('reactorStartBtn').textContent = '↺ Try Again';
+      }
+    }, 250);
+  };
 
-// ═══════════ GAME 5: SPOT THE CLOWN ═══════════
-const crewMembers = [
-  {name:'Vasquez', avatar:'👷'},
-  {name:'Petrov',  avatar:'🧑‍🔧'},
-  {name:'Okafor',  avatar:'👨‍✈️'},
-  {name:'Lindqvist',avatar:'🧑‍🔬'},
-  {name:'Honksworth',avatar:'🤡', isClown:true},
-  {name:'Torres',  avatar:'🛡️'},
-];
-let clownTimer = null;
-let clownTime = 10;
-let clownStarted = false;
-let clownDone = false;
-
-function startClownGame() {
-  clownDone = false; clownTime = 10; clownStarted = true;
-  document.getElementById('clownStartBtn').style.display = 'none';
-  document.getElementById('f-clown-game').value = 'in progress';
-  document.getElementById('clownTimerFill').style.width = '100%';
-  document.getElementById('clownTimerFill').style.background = 'var(--danger2)';
-
-  // Shuffle crew
-  const shuffled = [...crewMembers].sort(() => Math.random() - 0.5);
-  const lineup = document.getElementById('crewLineup');
-  lineup.innerHTML = '';
-  shuffled.forEach((member, i) => {
-    const el = document.createElement('div');
-    el.className = 'crew-member' + (member.isClown ? ' is-clown' : '');
-    el.innerHTML = '<span class="crew-avatar">' + member.avatar + '</span><span class="crew-name">' + member.name + '</span>';
-    el.addEventListener('click', () => pickCrewMember(el, member.isClown));
-    lineup.appendChild(el);
-  });
-
-  document.getElementById('clownMsg').textContent = 'Find the clown!';
-  document.getElementById('clownMsg').className = 'game-msg info';
-  clearInterval(clownTimer);
-  clownTimer = setInterval(() => {
-    clownTime -= 0.1;
-    const pct = (clownTime / 10) * 100;
-    document.getElementById('clownTimerFill').style.width = pct + '%';
-    if (clownTime <= 0 && !clownDone) {
-      clearInterval(clownTimer); clownDone = true;
-      document.getElementById('clownMsg').textContent = '✘ TIME UP — The clown escaped. Reindeer is disappointed in you.';
-      document.getElementById('clownMsg').className = 'game-msg fail';
-      document.getElementById('f-clown-game').value = 'FAILED — timed out';
-      document.getElementById('clownStartBtn').style.display = 'block';
-      document.getElementById('clownStartBtn').textContent = '↺ Try Again';
-      // Reveal the clown
-      document.querySelectorAll('.is-clown').forEach(el => el.style.outline = '2px solid var(--danger2)');
+  window.reactorPress = function(btn, correct) {
+    if (!rActive) return;
+    if (correct) {
+      clearInterval(rInterval); rActive = false;
+      btn.classList.add('right-btn');
+      setMsg('reactorMsg','✔ SCRAM — Reactor shutdown at '+Math.round(rPct)+'%. Jager is silently relieved.','pass');
+      document.getElementById('f-reactor-game').value = 'PASSED — shut down at '+Math.round(rPct)+'%';
+    } else {
+      btn.classList.add('wrong-btn');
+      rPct += 20;
+      updateGauge();
+      setMsg('reactorMsg','✘ Wrong button! Output jumped to '+Math.round(rPct)+'%.','fail');
+      setTimeout(() => btn.classList.remove('wrong-btn'), 500);
     }
-  }, 100);
-}
+  };
 
-function pickCrewMember(el, isClown) {
-  if (!clownStarted || clownDone) return;
-  if (isClown) {
-    clearInterval(clownTimer); clownDone = true;
-    el.classList.add('right-pick');
-    const timeLeft = clownTime.toFixed(1);
-    document.getElementById('clownMsg').textContent = '✔ CLOWN IDENTIFIED — ' + timeLeft + 's remaining. Reindeer has already opened fire.';
-    document.getElementById('clownMsg').className = 'game-msg pass';
-    document.getElementById('f-clown-game').value = 'PASSED — ' + timeLeft + 's remaining';
-    document.getElementById('clownStartBtn').style.display = 'none';
-    document.querySelectorAll('.crew-member').forEach(m => m.style.pointerEvents = 'none');
-  } else {
-    el.classList.add('wrong-pick');
-    clownTime -= 2;
-    document.getElementById('clownMsg').textContent = '✘ Not a clown! -2 seconds.';
-    setTimeout(() => el.classList.remove('wrong-pick'), 400);
+  // ── GAME 4: SPOT THE CLOWN ──
+  const crew = [
+    {name:'Vasquez',   avatar:'👷'},
+    {name:'Petrov',    avatar:'🧑‍🔧'},
+    {name:'Okafor',    avatar:'👨‍✈️'},
+    {name:'Lindqvist', avatar:'🧑‍🔬'},
+    {name:'Honksworth',avatar:'🤡', isClown:true},
+    {name:'Torres',    avatar:'🛡️'},
+  ];
+  let cTimer=null, cTime=10, cDone=false, cStarted=false;
+
+  window.startClownGame = function() {
+    cDone=false; cTime=10; cStarted=true;
+    document.getElementById('clownStartBtn').style.display='none';
+    document.getElementById('f-clown-game').value='in progress';
+    const fill = document.getElementById('clownTimerFill');
+    fill.style.width='100%'; fill.style.background='var(--danger2)';
+
+    const shuffled = [...crew].sort(()=>Math.random()-0.5);
+    const lineup = document.getElementById('crewLineup');
+    lineup.innerHTML='';
+    shuffled.forEach(member => {
+      const el = document.createElement('div');
+      el.className='crew-member';
+      el.innerHTML='<span class="crew-avatar">'+member.avatar+'</span><span class="crew-name">'+member.name+'</span>';
+      el.addEventListener('click', function() {
+        if (!cStarted||cDone) return;
+        if (member.isClown) {
+          clearInterval(cTimer); cDone=true;
+          el.classList.add('right-pick');
+          setMsg('clownMsg','✔ IDENTIFIED — '+cTime.toFixed(1)+'s left. Reindeer has already opened fire.','pass');
+          document.getElementById('f-clown-game').value='PASSED — '+cTime.toFixed(1)+'s left';
+          lineup.querySelectorAll('.crew-member').forEach(m=>m.style.pointerEvents='none');
+          document.getElementById('clownStartBtn').style.display='none';
+        } else {
+          el.classList.add('wrong-pick');
+          cTime = Math.max(0, cTime-2);
+          setMsg('clownMsg','✘ Not a clown! -2 seconds.','fail');
+          setTimeout(()=>el.classList.remove('wrong-pick'),400);
+        }
+      });
+      lineup.appendChild(el);
+    });
+
+    setMsg('clownMsg','Find the clown! Wrong picks cost 2 seconds.','info');
+    clearInterval(cTimer);
+    cTimer = setInterval(()=>{
+      cTime -= 0.1;
+      fill.style.width = Math.max(0,(cTime/10)*100)+'%';
+      if (cTime<=0 && !cDone) {
+        clearInterval(cTimer); cDone=true;
+        setMsg('clownMsg','✘ TIME UP — The clown escaped. Reindeer is disappointed.','fail');
+        document.getElementById('f-clown-game').value='FAILED — timed out';
+        document.getElementById('clownStartBtn').style.display='block';
+        document.getElementById('clownStartBtn').textContent='↺ Try Again';
+        lineup.querySelectorAll('.is-clown,.crew-member').forEach(m=>{
+          if(m.querySelector('.crew-avatar')&&m.querySelector('.crew-avatar').textContent==='🤡')
+            m.style.outline='2px solid var(--danger2)';
+        });
+      }
+    },100);
+  };
+
+  // ── HELPER ──
+  function setMsg(id, txt, cls) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = txt;
+    el.className = 'game-msg' + (cls ? ' '+cls : '');
   }
-}
 
+});
 </script>
 </body>
 </html>
