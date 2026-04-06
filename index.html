@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barotrauma — Crew Application</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #050d14;
+      --panel:     #081520;
+      --border:    #1a3a50;
+      --accent:    #00c8ff;
+      --accent2:   #ff6b35;
+      --warn:      #ffcc00;
+      --text:      #a8cfe0;
+      --text-dim:  #4a7a96;
+      --success:   #00ff88;
+      --glow:      0 0 12px rgba(0,200,255,0.4);
+      --glow2:     0 0 18px rgba(255,107,53,0.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── Animated background ── */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    .bubbles {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(0,200,255,0.15), transparent 70%);
+      border: 1px solid rgba(0,200,255,0.08);
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(-110vh) translateX(40px) scale(1.2); opacity: 0; }
+    }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+    }
+
+    /* Vignette */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative; z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown 0.8s ease both;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .corp-badge {
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.25em;
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      padding: 4px 14px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      box-shadow: var(--glow2);
+      animation: pulse-border 3s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: var(--glow2); }
+      50%       { box-shadow: 0 0 28px rgba(255,107,53,0.7); }
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      line-height: 1.1;
+      color: #fff;
+      text-shadow: 0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,200,255,0.2);
+      letter-spacing: 0.04em;
+    }
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .depth-bar {
+      margin: 24px auto 0;
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      box-shadow: var(--glow);
+    }
+
+    /* ── Warning banner ── */
+    .warning-strip {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--warn);
+      border: 1px solid rgba(255,204,0,0.3);
+      background: rgba(255,204,0,0.05);
+      padding: 10px 16px;
+      margin-bottom: 32px;
+      letter-spacing: 0.1em;
+      animation: fadeUp 0.9s 0.3s ease both;
+    }
+    .warning-strip::before { content: '⚠ '; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Form panels ── */
+    .form-section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+      position: relative;
+      animation: fadeUp 0.7s ease both;
+      transition: border-color 0.3s;
+    }
+    .form-section:hover { border-left-color: var(--accent2); }
+    .form-section::before {
+      content: attr(data-index);
+      position: absolute;
+      top: -1px; right: 16px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      background: var(--panel);
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    label {
+      display: block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .field-hint {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      font-style: italic;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      background: rgba(0,200,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      -webkit-appearance: none;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: var(--glow), inset 0 0 20px rgba(0,200,255,0.04);
+      background: rgba(0,200,255,0.06);
+    }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    select { cursor: pointer; }
+    select option { background: #0a1e2e; color: var(--text); }
+
+    /* Salary slider */
+    .slider-wrap { display: flex; align-items: center; gap: 16px; }
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--border) 0%);
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: var(--glow);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+    .salary-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      color: var(--accent);
+      min-width: 56px;
+      text-align: right;
+    }
+
+    /* Two-col row */
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .row-2 { grid-template-columns: 1fr; } }
+
+    /* ── Role cards ── */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 520px) { .roles-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .role-card {
+      border: 1px solid var(--border);
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      user-select: none;
+    }
+    .role-card input[type="radio"] { display: none; }
+    .role-card:hover { border-color: var(--accent); background: rgba(0,200,255,0.05); }
+    .role-card.selected {
+      border-color: var(--accent);
+      background: rgba(0,200,255,0.1);
+      box-shadow: var(--glow);
+    }
+    .role-card.selected .role-name { color: var(--accent); }
+    .role-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    .role-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      transition: color 0.2s;
+    }
+    .role-check {
+      position: absolute; top: 5px; right: 6px;
+      font-size: 0.6rem; color: var(--accent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .role-card.selected .role-check { opacity: 1; }
+
+    /* ── Clown warning ── */
+    .clown-options { display: flex; gap: 12px; }
+    .clown-btn {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    .clown-btn:hover { border-color: var(--warn); color: var(--warn); }
+    .clown-btn.active-no  { border-color: var(--success); color: var(--success); background: rgba(0,255,136,0.06); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .clown-btn.active-yes { border-color: var(--accent2); color: var(--accent2); background: rgba(255,107,53,0.08); box-shadow: var(--glow2); }
+
+    /* ── Availability checkboxes ── */
+    .avail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .avail-item { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 10px; border: 1px solid transparent; transition: all 0.2s; }
+    .avail-item:hover { border-color: var(--border); background: rgba(0,200,255,0.04); }
+    .avail-item input { display: none; }
+    .avail-box {
+      width: 16px; height: 16px; min-width: 16px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; color: transparent;
+      transition: all 0.2s;
+    }
+    .avail-item input:checked ~ .avail-box { border-color: var(--accent); background: var(--accent); color: #000; }
+    .avail-label { font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--text-dim); transition: color 0.2s; }
+    .avail-item:has(input:checked) .avail-label { color: var(--text); }
+
+    /* ── Submit button ── */
+    .submit-zone { text-align: center; margin-top: 36px; }
+    .submit-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      padding: 18px 60px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    }
+    .submit-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    .submit-btn:hover { background: #fff; box-shadow: 0 0 40px rgba(0,200,255,0.6); }
+    .submit-btn:hover::before { transform: translateX(100%); }
+    .submit-btn:active { transform: scale(0.97); }
+
+    .submit-note {
+      margin-top: 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Success screen ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+      animation: fadeUp 0.7s ease both;
+    }
+    .success-screen.show { display: block; }
+    .success-icon { font-size: 3rem; margin-bottom: 20px; }
+    .success-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      color: var(--success);
+      text-shadow: 0 0 20px rgba(0,255,136,0.4);
+      margin-bottom: 12px;
+    }
+    .success-msg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    /* ── Depth meter decoration ── */
+    .depth-meter {
+      position: fixed;
+      right: 20px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      opacity: 0.35;
+    }
+    @media (max-width: 900px) { .depth-meter { display: none; } }
+    .depth-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      writing-mode: vertical-rl;
+      margin-bottom: 6px;
+    }
+    .depth-track {
+      width: 2px; height: 200px;
+      background: var(--border);
+      position: relative;
+    }
+    .depth-fill {
+      position: absolute; bottom: 0; left: 0; width: 100%;
+      background: var(--accent);
+      box-shadow: var(--glow);
+      transition: height 0.4s ease;
+    }
+    .depth-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    /* stagger animations */
+    .form-section:nth-child(1) { animation-delay: 0.1s; }
+    .form-section:nth-child(2) { animation-delay: 0.18s; }
+    .form-section:nth-child(3) { animation-delay: 0.26s; }
+    .form-section:nth-child(4) { animation-delay: 0.34s; }
+    .form-section:nth-child(5) { animation-delay: 0.42s; }
+    .form-section:nth-child(6) { animation-delay: 0.5s; }
+    .form-section:nth-child(7) { animation-delay: 0.58s; }
+    .form-section:nth-child(8) { animation-delay: 0.66s; }
+    .form-section:nth-child(9) { animation-delay: 0.74s; }
+
+    /* Error state */
+    input.error, textarea.error, select.error {
+      border-color: var(--accent2) !important;
+      box-shadow: 0 0 8px rgba(255,107,53,0.4) !important;
+    }
+    .error-msg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      margin-top: 6px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Bubbles -->
+<div class="bubbles" id="bubbles"></div>
+
+<!-- Depth meter -->
+<div class="depth-meter">
+  <span class="depth-label">DEPTH</span>
+  <div class="depth-track"><div class="depth-fill" id="depthFill" style="height:0%"></div></div>
+  <span class="depth-val" id="depthVal">0m</span>
+</div>
+
+<div class="page">
+  <header>
+    <div class="corp-badge">Europacorp — Crew Requisition Division</div>
+    <h1>CREW<br/><span>APPLICATION</span></h1>
+    <p class="subtitle">// SUBMARINE OPERATIONS — CLASSIFIED DEPTH //</p>
+    <div class="depth-bar"></div>
+  </header>
+
+  <div class="warning-strip">
+    All personnel must complete this form prior to boarding. Incomplete or falsified applications will result in immediate ejection from the airlock.
+  </div>
+
+  <form id="appForm" novalidate>
+
+    <!-- 1 & 2: Name + Age in one row -->
+    <div class="form-section row-2" data-index="FIELD 01–02">
+      <div>
+        <label for="name">Name / Surname</label>
+        <input type="text" id="name" placeholder="e.g. John Doe" autocomplete="off"/>
+        <span class="error-msg" id="nameErr">Name is required.</span>
+      </div>
+      <div>
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="18" min="16" max="99"/>
+        <span class="error-msg" id="ageErr">Please enter a valid age.</span>
+      </div>
+    </div>
+
+    <!-- 3: Role -->
+    <div class="form-section" data-index="FIELD 03">
+      <label>Desired Job Role</label>
+      <span class="field-hint">Select the position you are applying for aboard the vessel.</span>
+      <div class="roles-grid">
+        <label class="role-card" id="card-captain">
+          <input type="radio" name="role" value="Captain"/>
+          <span class="role-icon">🎖️</span>
+          <span class="role-name">Captain</span>
+          <span class="role-check">✔</span>
+        </label>
+        <label class="role-card" id="card-medic">
+          <input type="radio" name="role" value="Medic"/>
+          <span class="role-icon">⚕️</span>
+          <span class="role-name">Medic</span>
+          <span class="role-check">✔</span>
+        </label>
+        <label class="role-card" id="card-engineer">
+          <input type="radio" name="role" value="Engineer"/>
+          <span class="role-icon">⚙️</span>
+          <span class="role-name">Engineer</span>
+          <span class="role-check">✔</span>
+        </label>
+        <label class="role-card" id="card-mechanic">
+          <input type="radio" name="role" value="Mechanic"/>
+          <span class="role-icon">🔧</span>
+          <span class="role-name">Mechanic</span>
+          <span class="role-check">✔</span>
+        </label>
+        <label class="role-card" id="card-security">
+          <input type="radio" name="role" value="Security"/>
+          <span class="role-icon">🛡️</span>
+          <span class="role-name">Security</span>
+          <span class="role-check">✔</span>
+        </label>
+        <label class="role-card" id="card-assistant">
+          <input type="radio" name="role" value="Assistant"/>
+          <span class="role-icon">🪣</span>
+          <span class="role-name">Assistant</span>
+          <span class="role-check">✔</span>
+        </label>
+      </div>
+      <span class="error-msg" id="roleErr">Please select a role.</span>
+    </div>
+
+    <!-- 4: Experience -->
+    <div class="form-section" data-index="FIELD 04">
+      <label for="experience">Previous Experience</label>
+      <span class="field-hint">Relevant skills, prior expeditions, certifications. Be honest — we'll find out either way.</span>
+      <textarea id="experience" placeholder="Describe your experience aboard Europa's submarines or on the surface colonies..."></textarea>
+    </div>
+
+    <!-- 5 & 6: Likes / Dislikes -->
+    <div class="form-section row-2" data-index="FIELD 05–06">
+      <div>
+        <label for="likes">What You Like</label>
+        <span class="field-hint">In gameplay, teamwork, or general.</span>
+        <textarea id="likes" placeholder="e.g. coordinated teamwork, fixing reactor..."></textarea>
+      </div>
+      <div>
+        <label for="dislikes">What You Don't Like</label>
+        <span class="field-hint">We won't hold it against you. Mostly.</span>
+        <textarea id="dislikes" placeholder="e.g. chaos, being left alone with a clown..."></textarea>
+      </div>
+    </div>
+
+    <!-- 7: Clown -->
+    <div class="form-section" data-index="FIELD 07">
+      <label>History with the Clown Gang?</label>
+      <span class="field-hint">Any prior affiliation, accidental incitement, or "incidents" must be disclosed.</span>
+      <div class="clown-options">
+        <button type="button" class="clown-btn" id="clownNo"  onclick="setClown('no')">🟢 &nbsp;No Affiliation</button>
+        <button type="button" class="clown-btn" id="clownYes" onclick="setClown('yes')">🤡 &nbsp;I Plead the Fifth</button>
+      </div>
+      <input type="hidden" id="clown" value=""/>
+      <span class="error-msg" id="clownErr">This field is mandatory. We know why.</span>
+    </div>
+
+    <!-- 8: Availability -->
+    <div class="form-section" data-index="FIELD 08">
+      <label>Availability</label>
+      <span class="field-hint">Select all that apply. Missions depart at Europa's discretion.</span>
+      <div class="avail-grid">
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="Weekday Evenings"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">Weekday Evenings</span>
+        </label>
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="Weekday Daytime"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">Weekday Daytime</span>
+        </label>
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="Weekend Daytime"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">Weekend Daytime</span>
+        </label>
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="Weekend Evenings"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">Weekend Evenings</span>
+        </label>
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="Flexible"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">Fully Flexible</span>
+        </label>
+        <label class="avail-item">
+          <input type="checkbox" name="avail" value="On-Call"/>
+          <span class="avail-box">✔</span>
+          <span class="avail-label">On-Call / Emergency</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 9: Salary -->
+    <div class="form-section" data-index="FIELD 09">
+      <label>Salary Expectations</label>
+      <span class="field-hint">In % of mission loot. The submarine needs fuel too, you know.</span>
+      <div class="slider-wrap">
+        <input type="range" id="salary" min="0" max="50" value="15" step="1"
+          oninput="updateSalary(this.value)"/>
+        <span class="salary-val" id="salaryVal">15%</span>
+      </div>
+    </div>
+
+    <!-- 10: Suggestions -->
+    <div class="form-section" data-index="FIELD 10">
+      <label for="suggestions">Open Suggestions</label>
+      <span class="field-hint">Anything else command should know. Grievances, requests, threats.</span>
+      <textarea id="suggestions" placeholder="Optional. This field is monitored."></textarea>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-zone">
+      <button type="submit" class="submit-btn">SUBMIT APPLICATION</button>
+      <p class="submit-note">// Transmission encrypted — EuropaNet relay //</p>
+    </div>
+
+  </form>
+
+  <!-- Success -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">📡</div>
+    <h2 class="success-title">APPLICATION RECEIVED</h2>
+    <p class="success-msg">
+      Your file has been transmitted to command.<br/>
+      Screening will be conducted at depth.<br/>
+      Do not contact us. We will find you.<br/><br/>
+      <span style="color: var(--accent);">— EuropaCorp Crew Requisition Division</span>
+    </p>
+  </div>
+</div>
+
+<script>
+  // ── Bubbles ──
+  const container = document.getElementById('bubbles');
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 10 + Math.random() * 40;
+    b.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${10+Math.random()*20}s;
+      animation-delay:${Math.random()*15}s;
+    `;
+    container.appendChild(b);
+  }
+
+  // ── Salary slider ──
+  function updateSalary(v) {
+    document.getElementById('salaryVal').textContent = v + '%';
+    const slider = document.getElementById('salary');
+    const pct = (v / 50) * 100;
+    slider.style.background = `linear-gradient(90deg, var(--accent) ${pct}%, var(--border) ${pct}%)`;
+  }
+  updateSalary(15);
+
+  // ── Role cards ──
+  document.querySelectorAll('.role-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // ── Clown buttons ──
+  let clownVal = '';
+  function setClown(v) {
+    clownVal = v;
+    document.getElementById('clown').value = v;
+    document.getElementById('clownNo').classList.toggle('active-no', v === 'no');
+    document.getElementById('clownYes').classList.toggle('active-yes', v === 'yes');
+    document.getElementById('clownErr').classList.remove('show');
+  }
+
+  // ── Depth meter (scroll-based) ──
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = Math.min(100, (scrolled / total) * 100);
+    document.getElementById('depthFill').style.height = pct + '%';
+    document.getElementById('depthVal').textContent = Math.round(pct * 4) + 'm';
+  });
+
+  // ── Validation & Submit ──
+  document.getElementById('appForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    const name = document.getElementById('name').value.trim();
+    const age  = document.getElementById('age').value;
+    const role = document.querySelector('input[name="role"]:checked');
+    const clown = document.getElementById('clown').value;
+    const avail = [...document.querySelectorAll('input[name="avail"]:checked')].map(c => c.value);
+
+    // Name
+    if (!name) {
+      document.getElementById('name').classList.add('error');
+      document.getElementById('nameErr').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('name').classList.remove('error');
+      document.getElementById('nameErr').classList.remove('show');
+    }
+
+    // Age
+    if (!age || age < 16 || age > 99) {
+      document.getElementById('age').classList.add('error');
+      document.getElementById('ageErr').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('age').classList.remove('error');
+      document.getElementById('ageErr').classList.remove('show');
+    }
+
+    // Role
+    if (!role) {
+      document.getElementById('roleErr').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('roleErr').classList.remove('show');
+    }
+
+    // Clown
+    if (!clown) {
+      document.getElementById('clownErr').classList.add('show');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // ── Collect data ──
+    const payload = {
+      name,
+      age: parseInt(age),
+      role: role.value,
+      experience: document.getElementById('experience').value.trim(),
+      likes:       document.getElementById('likes').value.trim(),
+      dislikes:    document.getElementById('dislikes').value.trim(),
+      clown_history: clown,
+      availability:  avail.join(', '),
+      salary_pct:    parseInt(document.getElementById('salary').value),
+      suggestions:   document.getElementById('suggestions').value.trim(),
+      submitted_at:  new Date().toISOString()
+    };
+
+    const SUPABASE_URL = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
+
+    // Disable button while sending
+    const btn = document.querySelector('.submit-btn');
+    btn.textContent = 'TRANSMITTING...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/applications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      // Show success
+      document.getElementById('appForm').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (err) {
+      console.error('Submission error:', err);
+      btn.textContent = 'SUBMIT APPLICATION';
+      btn.disabled = false;
+      alert('⚠ Transmission failed. Check your connection and try again.');
+    }
+  });
+</script>
+</body>
+</html>
