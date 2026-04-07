@@ -995,39 +995,27 @@ document.getElementById('appForm').addEventListener('submit', async e => {
 });
 
 function showSuccessPopup() {
-  const popup = document.createElement('div');
+  var popup = document.createElement('div');
   popup.id = 'successPopup';
-  popup.style.cssText = [
-    'position:fixed','top:50%','left:50%','transform:translate(-50%,-50%)',
-    'z-index:9999','background:#0d1e2e','border:2px solid #8aad5a',
-    'padding:36px 36px 28px','max-width:480px','width:92%',
-    'box-shadow:0 0 60px rgba(138,173,90,0.35), 0 0 0 9999px rgba(0,0,0,0.75)',
-    'font-family:Share Tech Mono,monospace','text-align:center',
-    'animation:fadeIn 0.3s ease'
-  ].join(';');
-  popup.innerHTML = [
-    '<div style="font-size:2.4rem;margin-bottom:16px;">📡</div>',
-    '<div style="color:#8aad5a;font-family:Orbitron,sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.18em;margin-bottom:18px;text-shadow:0 0 20px rgba(138,173,90,0.5);">APPLICATION RECEIVED</div>',
-    '<div style="color:#a8c4d4;font-size:0.76rem;line-height:2;margin-bottom:20px;">',
-    'Your file has been transmitted to command.<br/>',
-    'Screening will be conducted at depth.<br/>',
-    'Sleepshenok Jr. will review your credentials personally.<br/>',
-    'He will be in touch. Eventually. Probably.<br/>',
-    '<span style="color:#7a9db0;font-size:0.68rem;font-style:italic;">',
-    '(Do not attempt to contact us. We know where you are.)',
-    '</span>',
-    '</div>',
-    '<div style="border-top:1px solid #1e3a50;padding-top:16px;margin-bottom:20px;">',
-    '<div style="color:#3a5a6e;font-size:0.66rem;letter-spacing:0.1em;margin-bottom:6px;">— EuropaCorp Crew Requisition Division —</div>',
-    '<div style="color:#4d6632;font-size:0.62rem;font-style:italic;">Licensed Contractor #4471-B &nbsp;|&nbsp; REF: EURO-SUB-CREW-7</div>',
-    '</div>',
-    '<button onclick="document.getElementById('successPopup').remove()" style="',
-    'font-family:Orbitron,sans-serif;font-size:0.72rem;font-weight:700;',
-    'letter-spacing:0.18em;color:#060e15;background:#8aad5a;border:none;',
-    'padding:12px 28px;cursor:pointer;width:100%;text-transform:uppercase;',
-    'clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);',
-    '">ACKNOWLEDGED — AWAIT CONTACT</button>'
-  ].join('');
+  popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#0d1e2e;border:2px solid #8aad5a;padding:36px 36px 28px;max-width:480px;width:92%;box-shadow:0 0 60px rgba(138,173,90,0.35),0 0 0 9999px rgba(0,0,0,0.75);font-family:Share Tech Mono,monospace;text-align:center;';
+  var btn = document.createElement('button');
+  btn.textContent = 'ACKNOWLEDGED — AWAIT CONTACT';
+  btn.style.cssText = 'font-family:Orbitron,sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.18em;color:#060e15;background:#8aad5a;border:none;padding:12px 28px;cursor:pointer;width:100%;text-transform:uppercase;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);margin-top:4px;';
+  btn.addEventListener('click', function() { popup.remove(); });
+  popup.innerHTML = '<div style="font-size:2.4rem;margin-bottom:16px;">📡</div>'
+    + '<div style="color:#8aad5a;font-family:Orbitron,sans-serif;font-size:0.9rem;font-weight:900;letter-spacing:0.18em;margin-bottom:18px;text-shadow:0 0 20px rgba(138,173,90,0.5);">APPLICATION RECEIVED</div>'
+    + '<div style="color:#a8c4d4;font-size:0.76rem;line-height:2;margin-bottom:20px;">'
+    + 'Your file has been transmitted to command.<br/>'
+    + 'Screening will be conducted at depth.<br/>'
+    + 'Sleepshenok Jr. will review your credentials personally.<br/>'
+    + 'He will be in touch. Eventually. Probably.<br/>'
+    + '<span style="color:#7a9db0;font-size:0.68rem;font-style:italic;">(Do not attempt to contact us. We know where you are.)</span>'
+    + '</div>'
+    + '<div style="border-top:1px solid #1e3a50;padding-top:16px;margin-bottom:20px;">'
+    + '<div style="color:#3a5a6e;font-size:0.66rem;letter-spacing:0.1em;margin-bottom:6px;">— EuropaCorp Crew Requisition Division —</div>'
+    + '<div style="color:#4d6632;font-size:0.62rem;font-style:italic;">Licensed Contractor #4471-B &nbsp;|&nbsp; REF: EURO-SUB-CREW-7</div>'
+    + '</div>';
+  popup.appendChild(btn);
   document.body.appendChild(popup);
 }
 
