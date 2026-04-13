@@ -385,9 +385,87 @@
       transition:opacity 0.3s; z-index:500;
     }
 
+  
+    /* ── ENTRY POPUP ── */
+    .entry-popup {
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(0,0,0,0.96);
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; padding:20px;
+      animation:fadeIn 0.6s ease;
+    }
+    .entry-popup.hiding {
+      animation:fadeOut 0.7s ease forwards;
+    }
+    @keyframes fadeOut { from{opacity:1} to{opacity:0;pointer-events:none} }
+    .entry-box {
+      border:1px solid var(--rust); max-width:520px; width:100%;
+      padding:48px 44px; text-align:center; position:relative;
+      background:rgba(9,20,32,0.95);
+      box-shadow:0 0 80px rgba(196,122,53,0.2), 0 0 0 1px rgba(196,122,53,0.1);
+    }
+    .entry-box::before {
+      content:''; position:absolute; top:8px; left:8px; right:8px; bottom:8px;
+      border:1px solid rgba(196,122,53,0.15); pointer-events:none;
+    }
+    .entry-corp {
+      font-family:'Share Tech Mono',monospace; font-size:0.62rem;
+      letter-spacing:0.28em; color:var(--rust); text-transform:uppercase;
+      margin-bottom:24px; opacity:0.8;
+    }
+    .entry-logo {
+      font-size:2.8rem; margin-bottom:20px; display:block;
+    }
+    .entry-title {
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      font-size:clamp(1rem,3vw,1.5rem); letter-spacing:0.1em;
+      color:var(--text-bright); margin-bottom:8px;
+      text-shadow:0 0 30px rgba(138,173,90,0.3);
+    }
+    .entry-sub {
+      font-family:'Share Tech Mono',monospace; font-size:0.7rem;
+      color:var(--text-dim); letter-spacing:0.12em; margin-bottom:32px;
+      line-height:1.8;
+    }
+    .entry-sub em { color:var(--rust); font-style:normal; }
+    .entry-btn {
+      font-family:'Orbitron',sans-serif; font-weight:700;
+      font-size:0.78rem; letter-spacing:0.22em; text-transform:uppercase;
+      color:var(--bg); background:var(--accent); border:none;
+      padding:16px 48px; cursor:pointer;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+      transition:all 0.2s; position:relative; overflow:hidden;
+      animation:pulseGlow 2s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%,100%{ box-shadow:0 0 20px rgba(138,173,90,0.3); }
+      50%    { box-shadow:0 0 40px rgba(138,173,90,0.6); }
+    }
+    .entry-btn:hover { background:var(--text-bright); }
+    .entry-fine {
+      margin-top:16px; font-family:'Share Tech Mono',monospace;
+      font-size:0.58rem; color:var(--text-dim); letter-spacing:0.08em;
+      opacity:0.6;
+    }
+
   </style>
 </head>
 <body>
+
+<div class="entry-popup" id="entryPopup">
+  <div class="entry-box">
+    <span class="entry-logo">🌊</span>
+    <div class="entry-corp">EuropaCorp — Classified Access Terminal</div>
+    <div class="entry-title">CREW REQUISITION PORTAL</div>
+    <div class="entry-sub">
+      You are accessing a restricted EuropaCorp recruitment terminal.<br/>
+      All activity is logged. All applicants are screened.<br/>
+      <em>Survival is not guaranteed. Neither is the submarine.</em>
+    </div>
+    <button class="entry-btn" id="entryBtn">PROCEED TO APPLICATION</button>
+    <div class="entry-fine">By proceeding you waive all rights to a refund, a lifeboat, or a sensible explanation.</div>
+  </div>
+</div>
 
 <div class="vol-widget" id="volWidget">
   <span class="vol-icon" id="volIcon">🔇</span>
@@ -1431,10 +1509,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Start on first page click
-  window.addEventListener('click', function onFirstClick() {
+  // Entry popup handles first click + audio start
+  document.getElementById('entryBtn').addEventListener('click', function() {
     startAudio();
-    window.removeEventListener('click', onFirstClick);
-  }, { once: true });
+    var popup = document.getElementById('entryPopup');
+    popup.classList.add('hiding');
+    setTimeout(function() { popup.style.display = 'none'; }, 700);
+  });
 
   // Volume slider control
   if (slider) {
