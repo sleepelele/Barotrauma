@@ -1053,7 +1053,6 @@ document.getElementById('appForm').addEventListener('submit', async e => {
     if (firstErr) firstErr.scrollIntoView({ behavior:'smooth', block:'center' });
 
     // Show popup
-    playError();
     showMissingPopup(missing);
     return;
   }
@@ -1093,7 +1092,6 @@ document.getElementById('appForm').addEventListener('submit', async e => {
     if (!res.ok) throw new Error(await res.text());
     document.getElementById('appForm').style.display = 'none';
     window.scrollTo({ top:0, behavior:'smooth' });
-    playSuccess();
     setTimeout(showSuccessPopup, 300);
   } catch(err) {
     console.error(err);
@@ -1462,82 +1460,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // ════════════════════════════════════════════
 // FEATURE JS
 // ════════════════════════════════════════════
-
-// ── UI SOUND ENGINE (Web Audio) ──
-var uiAudioCtx = null;
-function getUiCtx() {
-  if (!uiAudioCtx) uiAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (uiAudioCtx.state === 'suspended') uiAudioCtx.resume();
-  return uiAudioCtx;
-}
-
-function playClick() {
-  try {
-    var ctx = getUiCtx();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(1200, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.06);
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime + 0.1);
-  } catch(e) {}
-}
-
-function playSuccess() {
-  try {
-    var ctx = getUiCtx();
-    [523, 659, 784, 1047].forEach(function(freq, i) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1);
-      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + i * 0.1 + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.25);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + i * 0.1);
-      osc.stop(ctx.currentTime + i * 0.1 + 0.3);
-    });
-  } catch(e) {}
-}
-
-function playError() {
-  try {
-    var ctx = getUiCtx();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime + 0.4);
-  } catch(e) {}
-}
-
-// Attach click sounds to all interactive elements
-document.addEventListener('DOMContentLoaded', function() {
-  function addClickSound(selector) {
-    document.querySelectorAll(selector).forEach(function(el) {
-      el.addEventListener('click', playClick);
-    });
-  }
-  addClickSound('.clown-btn');
-  addClickSound('.yn-btn');
-  addClickSound('.mcq-option');
-  addClickSound('.role-card');
-  addClickSound('.avail-item');
-  addClickSound('.decl-item');
-  addClickSound('.mcq-btn');
-  addClickSound('.game-retry');
-  addClickSound('.reactor-btn');
-  addClickSound('.crew-member');
-  addClickSound('.drug-card');
-});
 
 // ── APPLICANT COUNTER ──
 (function() {
