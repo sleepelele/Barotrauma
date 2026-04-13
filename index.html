@@ -2079,9 +2079,39 @@ document.addEventListener('DOMContentLoaded', function() {
   var SUPA_KEY_R = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
 
   var ROLES = ['Captain','Medic','Engineer','Mechanic','Security','Assistant'];
-  var ICONS = {Captain:'🎖️',Medic:'⚕️',Engineer:'⚡',Mechanic:'🔧',Security:'🛡️',Assistant:'🪣'};
 
-  // Load on start, refresh every 30s
+  function renderRoster(apps) {
+    var grid  = document.getElementById('rosterGrid');
+    var total = document.getElementById('rosterTotal');
+    if (!grid) return;
+    if (total) total.textContent = apps.length;
+    var byRole = {};
+    ROLES.forEach(function(r) { byRole[r] = []; });
+    apps.forEach(function(a) {
+      if (a.role && byRole[a.role] !== undefined) byRole[a.role].push(a.name || 'Unknown');
+    });
+    grid.innerHTML = ROLES.map(function(role) {
+      var names = byRole[role];
+      var filled = names.length > 0;
+      return '<div class="roster-slot' + (filled ? ' filled' : '') + '">'
+        + '<div class="roster-slot-role">' + role + '</div>'
+        + '<div class="roster-names">'
+        + (filled
+          ? names.map(function(n){ return '<div class="roster-name">' + n + '</div>'; }).join('')
+          : '<div class="roster-empty">Vacant</div>')
+        + '</div></div>';
+    }).join('');
+  }
+
+  function loadRoster() {
+    fetch(SUPA_URL_R + '/rest/v1/applications?select=name,role&order=submitted_at.asc', {
+      headers: { 'apikey': SUPA_KEY_R, 'Authorization': 'Bearer ' + SUPA_KEY_R }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { if (Array.isArray(data)) renderRoster(data); })
+    .catch(function(e) { console.warn('Roster load failed:', e); });
+  }
+
   loadRoster();
   setInterval(loadRoster, 30000);
 })();
