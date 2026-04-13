@@ -608,68 +608,7 @@
     }
 
   
-    /* ── CREW ROSTER ── */
-    .roster-wrap {
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent-dim);
-      background: rgba(4,10,16,0.6);
-      padding: 18px 20px;
-      animation: revealSection 0.6s 0.07s ease both;
-    }
-    .roster-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .roster-title {
-      font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase;
-    }
-    .roster-live {
-      display: flex; align-items: center; gap: 6px;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
-      color: var(--text-dim); letter-spacing: 0.1em;
-    }
-    .roster-live-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--success);
-      animation: blink 1.4s ease-in-out infinite;
-    }
-    .roster-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    @media(max-width: 520px) { .roster-grid { grid-template-columns: repeat(2, 1fr); } }
-    .roster-slot {
-      border: 1px solid var(--border);
-      background: rgba(4,10,16,0.5);
-      padding: 10px 12px;
-      min-height: 54px;
-      transition: all 0.3s;
-    }
-    .roster-slot.filled {
-      border-color: var(--accent-dim);
-      background: rgba(138,173,90,0.05);
-    }
-    .roster-slot-role {
-      font-family: 'Orbitron', sans-serif; font-size: 0.58rem; font-weight: 700;
-      letter-spacing: 0.14em; color: var(--accent-dim); text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-    .roster-slot.filled .roster-slot-role { color: var(--accent); }
-    .roster-names {
-      display: flex; flex-direction: column; gap: 3px;
-    }
-    .roster-name {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.66rem;
-      color: var(--text); letter-spacing: 0.06em;
-      animation: fadeIn 0.4s ease;
-    }
-    .roster-empty {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
-      color: var(--text-dim); font-style: italic; letter-spacing: 0.06em;
-    }
-    .roster-footer {
+        .roster-footer {
       display: flex; align-items: center; justify-content: space-between;
       margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
     }
@@ -820,20 +759,6 @@ If you are reading this notice and still considering applying — welcome. You'r
 — <em>Sleepshenok Jr., Crew Leader, EuropaCorp Licensed Contractor #4471-B</em>
 "I didn't know my relative personally. But I feel like I knew him well enough."</div>
   </div>
-
-  <div class="roster-wrap" id="rosterWrap">
-    <div class="roster-header">
-      <div class="roster-title">📋 Current Crew Roster</div>
-      <div class="roster-live"><span class="roster-live-dot"></span> LIVE</div>
-    </div>
-    <div class="roster-grid" id="rosterGrid">
-      <!-- filled by JS -->
-    </div>
-    <div class="roster-footer">
-      <div class="roster-count">Total applicants: <span id="rosterTotal">—</span></div>
-    </div>
-  </div>
-
   <div class="countdown-wrap" id="countdownWrap">
     <div class="countdown-label">Crew departure scheduled — time remaining</div>
     <div class="countdown-units" id="countdownUnits">
@@ -2073,47 +1998,6 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 
-// ── CREW ROSTER ──
-(function() {
-  var SUPA_URL_R = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
-  var SUPA_KEY_R = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
 
-  var ROLES = ['Captain','Medic','Engineer','Mechanic','Security','Assistant'];
-
-  function renderRoster(apps) {
-    var grid  = document.getElementById('rosterGrid');
-    var total = document.getElementById('rosterTotal');
-    if (!grid) return;
-    if (total) total.textContent = apps.length;
-    var byRole = {};
-    ROLES.forEach(function(r) { byRole[r] = []; });
-    apps.forEach(function(a) {
-      if (a.role && byRole[a.role] !== undefined) byRole[a.role].push(a.name || 'Unknown');
-    });
-    grid.innerHTML = ROLES.map(function(role) {
-      var names = byRole[role];
-      var filled = names.length > 0;
-      return '<div class="roster-slot' + (filled ? ' filled' : '') + '">'
-        + '<div class="roster-slot-role">' + role + '</div>'
-        + '<div class="roster-names">'
-        + (filled
-          ? names.map(function(n){ return '<div class="roster-name">' + n + '</div>'; }).join('')
-          : '<div class="roster-empty">Vacant</div>')
-        + '</div></div>';
-    }).join('');
-  }
-
-  function loadRoster() {
-    fetch(SUPA_URL_R + '/rest/v1/applications?select=name,role&order=submitted_at.asc', {
-      headers: { 'apikey': SUPA_KEY_R, 'Authorization': 'Bearer ' + SUPA_KEY_R }
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) { if (Array.isArray(data)) renderRoster(data); })
-    .catch(function(e) { console.warn('Roster load failed:', e); });
-  }
-
-  loadRoster();
-  setInterval(loadRoster, 30000);
-})();
 
 </script>
