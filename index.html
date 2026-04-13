@@ -566,6 +566,120 @@
       transition:opacity 0.5s;
     }
 
+  
+    /* ── COUNTDOWN TIMER ── */
+    .countdown-wrap {
+      text-align:center; margin-bottom:24px;
+      border:1px solid var(--border); border-left:3px solid var(--danger2);
+      background:rgba(196,48,48,0.04); padding:16px 20px;
+      animation:revealSection 0.6s 0.06s ease both;
+    }
+    .countdown-label {
+      font-family:'Share Tech Mono',monospace; font-size:0.62rem;
+      letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .countdown-label::before { content:'🚀 '; }
+    .countdown-units { display:flex; justify-content:center; gap:6px; align-items:center; flex-wrap:wrap; }
+    .countdown-unit { text-align:center; min-width:58px; }
+    .countdown-num {
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      font-size:clamp(1.4rem,4vw,2rem); color:var(--danger2);
+      line-height:1; display:block;
+      text-shadow:0 0 20px rgba(196,48,48,0.4);
+    }
+    .countdown-unit-label {
+      font-family:'Share Tech Mono',monospace; font-size:0.56rem;
+      color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase;
+      margin-top:3px; display:block;
+    }
+    .countdown-sep {
+      font-family:'Orbitron',sans-serif; font-size:1.6rem; font-weight:900;
+      color:var(--border2); line-height:1; padding-bottom:16px;
+    }
+    .countdown-expired {
+      font-family:'Orbitron',sans-serif; font-size:0.9rem; font-weight:700;
+      color:var(--danger2); letter-spacing:0.14em;
+      text-shadow:0 0 20px rgba(196,48,48,0.5);
+    }
+    .countdown-sub {
+      font-family:'Share Tech Mono',monospace; font-size:0.64rem;
+      color:var(--text-dim); letter-spacing:0.1em; margin-top:8px;
+    }
+
+  
+    /* ── CREW ROSTER ── */
+    .roster-wrap {
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-dim);
+      background: rgba(4,10,16,0.6);
+      padding: 18px 20px;
+      animation: revealSection 0.6s 0.07s ease both;
+    }
+    .roster-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .roster-title {
+      font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase;
+    }
+    .roster-live {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      color: var(--text-dim); letter-spacing: 0.1em;
+    }
+    .roster-live-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--success);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media(max-width: 520px) { .roster-grid { grid-template-columns: repeat(2, 1fr); } }
+    .roster-slot {
+      border: 1px solid var(--border);
+      background: rgba(4,10,16,0.5);
+      padding: 10px 12px;
+      min-height: 54px;
+      transition: all 0.3s;
+    }
+    .roster-slot.filled {
+      border-color: var(--accent-dim);
+      background: rgba(138,173,90,0.05);
+    }
+    .roster-slot-role {
+      font-family: 'Orbitron', sans-serif; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.14em; color: var(--accent-dim); text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .roster-slot.filled .roster-slot-role { color: var(--accent); }
+    .roster-names {
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .roster-name {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.66rem;
+      color: var(--text); letter-spacing: 0.06em;
+      animation: fadeIn 0.4s ease;
+    }
+    .roster-empty {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+      color: var(--text-dim); font-style: italic; letter-spacing: 0.06em;
+    }
+    .roster-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+    }
+    .roster-count {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+      color: var(--text-dim); letter-spacing: 0.1em;
+    }
+    .roster-count span { color: var(--accent); }
+
+
   </style>
 </head>
 <body>
@@ -707,6 +821,33 @@ If you are reading this notice and still considering applying — welcome. You'r
 "I didn't know my relative personally. But I feel like I knew him well enough."</div>
   </div>
 
+  <div class="roster-wrap" id="rosterWrap">
+    <div class="roster-header">
+      <div class="roster-title">📋 Current Crew Roster</div>
+      <div class="roster-live"><span class="roster-live-dot"></span> LIVE</div>
+    </div>
+    <div class="roster-grid" id="rosterGrid">
+      <!-- filled by JS -->
+    </div>
+    <div class="roster-footer">
+      <div class="roster-count">Total applicants: <span id="rosterTotal">—</span></div>
+    </div>
+  </div>
+
+  <div class="countdown-wrap" id="countdownWrap">
+    <div class="countdown-label">Crew departure scheduled — time remaining</div>
+    <div class="countdown-units" id="countdownUnits">
+      <div class="countdown-unit"><span class="countdown-num" id="cdDays">--</span><span class="countdown-unit-label">Days</span></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit"><span class="countdown-num" id="cdHours">--</span><span class="countdown-unit-label">Hours</span></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit"><span class="countdown-num" id="cdMins">--</span><span class="countdown-unit-label">Minutes</span></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit"><span class="countdown-num" id="cdSecs">--</span><span class="countdown-unit-label">Seconds</span></div>
+    </div>
+    <div class="countdown-sub">All crew must be aboard before departure. Late applicants will be left at depth.</div>
+  </div>
+
   <div class="applicant-counter">
     <span class="counter-dot"></span>
     APPLICATIONS RECEIVED THIS CYCLE: <span class="counter-num" id="appCounter">0</span> &nbsp;|&nbsp; STATUS: <span style="color:var(--success)">OPEN</span>
@@ -734,12 +875,12 @@ If you are reading this notice and still considering applying — welcome. You'r
       <label class="field-label">Desired Job Role — Priority Ranking</label>
       <span class="field-hint">Click roles in order of preference. <strong style="color:var(--rust)">1 = most desired</strong>, 6 = least desired. Click a ranked role to remove it.</span>
       <div class="roles-grid" id="rolesGrid">
-        <div class="role-card" data-role="Captain"><div class="role-tooltip">Commands the vessel. Responsible for navigation, crew morale, and pretending everything is fine.</div>   <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🎖️</span><span class="role-name">Captain</span>  </div>
-        <div class="role-card" data-role="Medic"><div class="role-tooltip">Keeps the crew alive. Mostly. Has access to the drug cabinet. This is relevant.</div>     <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">⚕️</span><span class="role-name">Medic</span>    </div>
-        <div class="role-card" data-role="Engineer"><div class="role-tooltip">Maintains systems and hull integrity. If the sub is intact, thank the Engineer.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">⚙️</span><span class="role-name">Engineer</span> </div>
-        <div class="role-card" data-role="Mechanic"><div class="role-tooltip">Fabricates weapons, equipment and repairs machinery. Also the one who fixes what the Engineer missed.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🔧</span><span class="role-name">Mechanic</span> </div>
-        <div class="role-card" data-role="Security"><div class="role-tooltip">Protects the crew from external threats. And internal ones. And Zez.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🛡️</span><span class="role-name">Security</span> </div>
-        <div class="role-card" data-role="Assistant"><div class="role-tooltip">Does whatever is needed. Role loosely defined. Outcome unpredictable.</div> <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🪣</span><span class="role-name">Assistant</span></div>
+        <div class="role-card" data-role="Captain"><div class="role-tooltip">Commands the vessel and makes all final decisions. Responsible for navigation, crew discipline, and pretending to know what the reactor is doing. Badlander held this role. Draw your own conclusions.</div>   <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🎖️</span><span class="role-name">Captain</span>  </div>
+        <div class="role-card" data-role="Medic"><div class="role-tooltip">Keeps the crew alive. Access to the drug cabinet is both a privilege and a temptation. Expected to perform surgery, dispense medication, and ask no questions. Sleep held this role. The drug cabinet was communal.</div>     <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">⚕️</span><span class="role-name">Medic</span>    </div>
+        <div class="role-card" data-role="Engineer"><div class="role-tooltip">Manages the reactor, engines and electrical grid. If the lights are on and the sub is moving, thank the Engineer. If not — also their fault. Do not let Zez near the junction boxes.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">⚙️</span><span class="role-name">Engineer</span> </div>
+        <div class="role-card" data-role="Mechanic"><div class="role-tooltip">Fabricates weapons, equipment and repairs mechanical systems. The sub runs on their work. Also responsible for cleaning up after everyone else breaks things. First to know when supplies run out, last to get credit.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🔧</span><span class="role-name">Mechanic</span> </div>
+        <div class="role-card" data-role="Security"><div class="role-tooltip">Protects the crew from external threats. Clowns, Husks, Mudraptors, and crew members who look at the reactor funny. Shoot first. Reindeer held this role. He did not ask questions.</div>  <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🛡️</span><span class="role-name">Security</span> </div>
+        <div class="role-card" data-role="Assistant"><div class="role-tooltip">Officially: general support duties. Unofficially: whatever everyone else refuses to do. Carries supplies, patches minor leaks, gets blamed for things. Bullhawk held this role. He was found in places he should not have been.</div> <span class="rank-badge"></span><span class="role-clear">✕</span><span class="role-icon">🪣</span><span class="role-name">Assistant</span></div>
       </div>
       <div class="rank-legend"><span>★ 1 = Top priority</span><span>6 = Least desired ☆</span></div>
       <span class="err-msg" id="e-role">Please rank at least your top 3 roles.</span>
@@ -1801,7 +1942,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
       el.classList.add('hiding');
       setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
-    }, 5000);
+    }, 10000);
     // Schedule next
     setTimeout(showIntercept, 10000 + Math.random() * 5000);
   }
@@ -1891,6 +2032,58 @@ document.addEventListener('DOMContentLoaded', function() {
     if (flash) { flash.classList.remove('active'); void flash.offsetWidth; flash.classList.add('active'); setTimeout(function(){ flash.classList.remove('active'); }, 700); }
     if (text)  { text.classList.remove('active');  void text.offsetWidth;  text.classList.add('active');  setTimeout(function(){ text.classList.remove('active'); }, 700); }
   });
+})();
+
+
+// ── COUNTDOWN TIMER ──
+(function() {
+  // ⚠ SET YOUR DEPARTURE DATE HERE
+  // Format: 'Month Day, Year HH:MM:SS'
+  var departureDate = new Date('November 1, 2026 20:00:00');
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function tick() {
+    var now  = new Date();
+    var diff = departureDate - now;
+
+    if (diff <= 0) {
+      var u = document.getElementById('countdownUnits');
+      if (u) u.innerHTML = '<div class="countdown-expired">⚠ CREW DEPARTED — BOARDING CLOSED</div>';
+      return;
+    }
+
+    var days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var secs  = Math.floor((diff % (1000 * 60)) / 1000);
+
+    var d = document.getElementById('cdDays');
+    var h = document.getElementById('cdHours');
+    var m = document.getElementById('cdMins');
+    var s = document.getElementById('cdSecs');
+    if (d) d.textContent = pad(days);
+    if (h) h.textContent = pad(hours);
+    if (m) m.textContent = pad(mins);
+    if (s) s.textContent = pad(secs);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
+
+// ── CREW ROSTER ──
+(function() {
+  var SUPA_URL_R = 'https://dyttrevzhxjmtdiynfpu.supabase.co';
+  var SUPA_KEY_R = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dHRyZXZ6aHhqbXRkaXluZnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NzQzNTgsImV4cCI6MjA5MTA1MDM1OH0.jfEEylD0LnXmitqy7lWDmL0TlGADaCvIW-yDhmuZHTg';
+
+  var ROLES = ['Captain','Medic','Engineer','Mechanic','Security','Assistant'];
+  var ICONS = {Captain:'🎖️',Medic:'⚕️',Engineer:'⚡',Mechanic:'🔧',Security:'🛡️',Assistant:'🪣'};
+
+  // Load on start, refresh every 30s
+  loadRoster();
+  setInterval(loadRoster, 30000);
 })();
 
 </script>
