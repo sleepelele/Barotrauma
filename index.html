@@ -303,6 +303,8 @@
 </head>
 <body>
 
+<audio id="bgAudio" loop src="https://raw.githubusercontent.com/sleepelele/Barotrauma/main/Baro_OST.mp3"></audio>
+
 <div class="bg-image" id="bgImage"></div>
 <div class="bg-overlay"></div>
 <div class="bg-red"></div>
@@ -1301,5 +1303,18 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
 }); // end DOMContentLoaded
+
+
+// ── AUDIO AUTOSTART ──
+window.addEventListener('click', function audioStart() {
+  var audio = document.getElementById('bgAudio');
+  var btn   = document.getElementById('soundBtn');
+  if (audio && audio.paused) {
+    audio.volume = 0.5;
+    audio.play().catch(function(){});
+    if (btn) { btn.textContent = '🔊'; btn.classList.add('active'); }
+  }
+  window.removeEventListener('click', audioStart);
+}, { once: true });
 
 </script>
