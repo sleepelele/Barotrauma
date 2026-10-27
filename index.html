@@ -15,7 +15,7 @@
       --glow-g:0 0 14px rgba(138,173,90,0.35); --glow-r:0 0 14px rgba(196,122,53,0.4);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;cursor:crosshair;}
+    body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden;cursor:crosshair;}
 
     .bg-image{position:fixed;inset:0;z-index:0;background-image:url('https://raw.githubusercontent.com/sleepelele/Barotrauma/main/bg.jpg');background-size:cover;background-position:center 30%;transform:scale(1.12);will-change:transform;transition:transform 0.05s linear;}
     .bg-overlay{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,rgba(4,10,16,0.82) 0%,rgba(4,10,16,0.65) 40%,rgba(4,10,16,0.80) 100%);}
@@ -76,7 +76,7 @@
     /* Poster block */
     .poster-block{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--rust);padding:24px 26px;margin-bottom:16px;position:relative;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:revealSection 0.6s 0.08s ease both;}
     .poster-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(0.9rem,2.2vw,1.3rem);color:var(--rust);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;text-shadow:var(--glow-r);}
-    .poster-body{font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--text);line-height:1.95;letter-spacing:0.04em;white-space:pre-line;}
+    .poster-body{font-family:'Share Tech Mono',monospace;font-size:0.87rem;color:var(--text);line-height:1.95;letter-spacing:0.04em;white-space:pre-line;}
     .poster-body em{color:var(--text-bright);font-style:normal;}
     .poster-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
     .poster-placeholder{font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-dim);font-style:italic;line-height:1.8;border:1px dashed var(--border2);padding:16px;text-align:center;}
@@ -91,8 +91,8 @@
     .section:nth-child(1){animation-delay:.1s}.section:nth-child(2){animation-delay:.18s}.section:nth-child(3){animation-delay:.26s}.section:nth-child(4){animation-delay:.34s}.section:nth-child(5){animation-delay:.42s}.section:nth-child(6){animation-delay:.5s}.section:nth-child(7){animation-delay:.58s}.section:nth-child(8){animation-delay:.66s}.section:nth-child(9){animation-delay:.74s}.section:nth-child(10){animation-delay:.82s}.section:nth-child(11){animation-delay:.9s}
     .section-tag{position:absolute;top:-1px;right:12px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.16em;background:#0d1e2e;padding:2px 8px;border:1px solid var(--border);border-top:none;}
 
-    label.field-label{display:block;font-family:'Orbitron',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
-    .field-hint{font-family:'Exo 2',sans-serif;font-size:0.78rem;color:var(--text-dim);font-style:italic;letter-spacing:0.03em;margin-bottom:10px;display:block;}
+    label.field-label{display:block;font-family:'Orbitron',sans-serif;font-size:0.76rem;font-weight:700;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
+    .field-hint{font-family:'Exo 2',sans-serif;font-size:0.85rem;color:var(--text-dim);font-style:italic;letter-spacing:0.03em;margin-bottom:10px;display:block;}
 
     input[type="text"],input[type="number"],textarea,select{width:100%;background:rgba(4,10,16,0.75);border:1px solid var(--border);color:var(--text-bright);font-family:'Share Tech Mono',monospace;font-size:0.86rem;padding:10px 12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;-webkit-appearance:none;}
     input[type="text"]:focus,input[type="number"]:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shadow:0 0 0 1px var(--accent-dim),inset 0 0 12px rgba(138,173,90,0.04);background:rgba(4,10,16,0.9);}
@@ -124,10 +124,11 @@
 
     /* Clown */
     .clown-row{display:flex;gap:10px;}
-    .clown-btn{flex:1;padding:12px;border:1px solid var(--border);background:rgba(4,10,16,0.6);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.78rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+    .clown-btn{flex:1;padding:12px;border:1px solid var(--border);background:rgba(4,10,16,0.6);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.84rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
     .clown-btn:hover{border-color:var(--border2);color:var(--text);}
     .clown-btn.no-active{border-color:var(--success);color:var(--success);background:rgba(106,170,58,0.08);box-shadow:0 0 10px rgba(106,170,58,0.2);}
     .clown-btn.yes-active{border-color:var(--danger2);color:var(--danger2);background:rgba(122,32,32,0.12);box-shadow:0 0 10px rgba(196,48,48,0.25);}
+    .clown-btn.btn-active{border-color:var(--accent);color:var(--accent);background:rgba(138,173,90,0.08);box-shadow:var(--glow-g);}
 
     /* Day availability */
     .day-grid{display:flex;flex-direction:column;gap:5px;}
@@ -169,7 +170,7 @@
     /* MCQ multiple choice */
     .mcq-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     @media(max-width:520px){.mcq-grid{grid-template-columns:1fr}}
-    .mcq-btn { border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:"Share Tech Mono",monospace; font-size:0.78rem; letter-spacing:0.06em; padding:12px 14px; cursor:pointer; transition:all 0.2s; user-select:none; }
+    .mcq-btn { border:1px solid var(--border); background:rgba(4,10,16,0.6); color:var(--text-dim); font-family:"Share Tech Mono",monospace; font-size:0.84rem; letter-spacing:0.06em; padding:12px 14px; cursor:pointer; transition:all 0.2s; user-select:none; }
     .mcq-btn:hover { border-color:var(--border2); color:var(--text); background:rgba(17,34,51,0.8); }
     .mcq-btn.selected { border-color:var(--accent); color:var(--accent); background:rgba(138,173,90,0.08); box-shadow:var(--glow-g); }
     /* Declarations */
@@ -1070,10 +1071,111 @@ If you are reading this notice and still considering applying — welcome. You'r
     <div class="section">
       <span class="section-tag">FIELD 18</span>
       <label class="field-label" for="f-modwishes">Steam Workshop — Mod Requests</label>
-      <span class="field-hint">Any mods you'd like to see in the campaign? List Steam Workshop mod names or IDs. Requests reviewed by command. Clown-themed mods will be ignored. Or installed. Depends on Bullhawk's mood.</span>
+      <span class="field-hint">Any mods you'd like to see in the campaign? List Steam Workshop mod names or IDs. Requests reviewed by command. Clown-themed mods will be ignored. Or installed.</span>
       <textarea id="f-modwishes" placeholder="Optional. e.g. 'More hats', 'Bigger reactor', 'Remove Zez'"></textarea>
     </div>
 
+
+    <!-- FIELD 19: Badlander idiot assessment -->
+    <div class="section">
+      <span class="section-tag">FIELD 19</span>
+      <label class="field-label">Prior Interaction Assessment — Badlander</label>
+      <span class="field-hint">Have you ever been called an idiot by Badlander? Be honest. He will know.</span>
+      <input type="hidden" id="f-badlander" value=""/>
+      <div class="clown-row" id="badlander-row" style="flex-wrap:wrap;gap:8px;">
+        <button type="button" class="clown-btn" data-val="yes" onclick="setBtnGroup('f-badlander','badlander-row',this)">YES</button>
+        <button type="button" class="clown-btn" data-val="not_yet" onclick="setBtnGroup('f-badlander','badlander-row',this)">NOT YET</button>
+        <button type="button" class="clown-btn" data-val="once_deserved" onclick="setBtnGroup('f-badlander','badlander-row',this)">ONCE, BUT I DESERVED IT</button>
+      </div>
+    </div>
+
+    <!-- FIELD 20: Hull breach management (MCQ) -->
+    <div class="section">
+      <span class="section-tag">FIELD 20</span>
+      <label class="field-label">Preferred Hull Breach Protocol</label>
+      <span class="field-hint">A philosophical question. There are several wrong answers.</span>
+      <div class="mcq-grid" id="mcq-hullbreach">
+        <label class="mcq-option"><input type="radio" name="hull_breach_method" value="A) Call Engineer"/><span class="mcq-letter">A</span><span class="mcq-text">Call for Engineer</span></label>
+        <label class="mcq-option"><input type="radio" name="hull_breach_method" value="B) Duct tape"/><span class="mcq-letter">B</span><span class="mcq-text">Duct tape</span></label>
+        <label class="mcq-option"><input type="radio" name="hull_breach_method" value="C) Pretend it's not happening"/><span class="mcq-letter">C</span><span class="mcq-text">Pretend it's not happening</span></label>
+        <label class="mcq-option"><input type="radio" name="hull_breach_method" value="D) Tell Zez it's the reactor's fault"/><span class="mcq-letter">D</span><span class="mcq-text">Tell Zez it's the reactor's fault</span></label>
+      </div>
+    </div>
+
+    <!-- FIELD 21: Oxygen discipline slider -->
+    <div class="section">
+      <span class="section-tag">FIELD 21</span>
+      <label class="field-label">Oxygen Discipline Rating</label>
+      <span class="field-hint">Rate your oxygen consumption during a shortage. <strong style="color:var(--rust)">1 = iron lungs, 5 = huffs the reserves like a buffet.</strong></span>
+      <div class="slider-row">
+        <input type="range" id="f-oxygen" min="1" max="5" value="1" step="1" oninput="updateOxygen(this.value)"/>
+        <span class="salary-display" id="oxygen-display" style="min-width:260px;font-size:0.8rem;text-align:left;">1 — Iron lungs</span>
+      </div>
+    </div>
+
+    <!-- FIELD 22: Outstanding warrants -->
+    <div class="section">
+      <span class="section-tag">FIELD 22</span>
+      <label class="field-label">Outstanding Warrants — Europan Jurisdiction</label>
+      <span class="field-hint">Any active warrants for arrest, detention, or aggressive marine life management? Declare now. Command will find out either way.</span>
+      <input type="hidden" id="f-warrants" value=""/>
+      <div class="clown-row" id="warrants-row" style="flex-wrap:wrap;gap:8px;">
+        <button type="button" class="clown-btn" data-val="yes" onclick="setBtnGroup('f-warrants','warrants-row',this)">YES</button>
+        <button type="button" class="clown-btn" data-val="no" onclick="setBtnGroup('f-warrants','warrants-row',this)">NO</button>
+        <button type="button" class="clown-btn" data-val="define_warrant" onclick="setBtnGroup('f-warrants','warrants-row',this)">DEFINE 'WARRANT'</button>
+      </div>
+    </div>
+
+    <!-- FIELD 23: Reactor beep at end of shift (MCQ) -->
+    <div class="section">
+      <span class="section-tag">FIELD 23</span>
+      <label class="field-label">End-of-Shift Reactor Incident Protocol</label>
+      <span class="field-hint">Your shift ends in 10 minutes. The reactor starts beeping. What do you do?</span>
+      <div class="mcq-grid" id="mcq-reactorbeep">
+        <label class="mcq-option"><input type="radio" name="reactor_beep" value="A) Stay and check it"/><span class="mcq-letter">A</span><span class="mcq-text">Stay and check it</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor_beep" value="B) That's day shift's problem"/><span class="mcq-letter">B</span><span class="mcq-text">That's day shift's problem</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor_beep" value="C) Tell Zez"/><span class="mcq-letter">C</span><span class="mcq-text">Tell Zez</span></label>
+        <label class="mcq-option"><input type="radio" name="reactor_beep" value="D) It's probably eggs"/><span class="mcq-letter">D</span><span class="mcq-text">It's probably eggs</span></label>
+      </div>
+    </div>
+
+    <!-- FIELD 24: Blood type -->
+    <div class="section">
+      <span class="section-tag">FIELD 24</span>
+      <label class="field-label" for="f-bloodtype">Blood Type</label>
+      <span class="field-hint">Asking for a friend. The friend is Sleep.</span>
+      <input type="text" id="f-bloodtype" placeholder="e.g. O+, A−, AB, 'unknown', 'blue apparently'"/>
+    </div>
+
+    <!-- FIELD 25: Clown Mother as personal saviour -->
+    <div class="section">
+      <span class="section-tag">FIELD 25</span>
+      <label class="field-label">Theological Commitment Assessment</label>
+      <span class="field-hint">Have you accepted the Clown Mother as your personal saviour?</span>
+      <input type="hidden" id="f-clown-saviour" value=""/>
+      <div class="clown-row" id="clownmother-row" style="flex-wrap:wrap;gap:8px;">
+        <button type="button" class="clown-btn" data-val="yes" onclick="setClownMother('yes',this)">YES</button>
+        <button type="button" class="clown-btn" data-val="no" onclick="setClownMother('no',this)">NO</button>
+        <button type="button" class="clown-btn" data-val="HONK" onclick="setClownMother('HONK',this)">HONK</button>
+      </div>
+      <div id="clown-tithe-notice" style="display:none;margin-top:10px;padding:8px 14px;border:1px solid var(--danger2);background:rgba(196,48,48,0.06);font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--danger2);letter-spacing:0.06em;">
+        ⚠ CLOWN TITHE APPLIED — Salary contribution reduced by 1%. Praise the Honk.
+      </div>
+    </div>
+
+    <!-- FIELD 26: Prior submarine experience -->
+    <div class="section">
+      <span class="section-tag">FIELD 26</span>
+      <label class="field-label">Prior Submarine Experience</label>
+      <span class="field-hint">Have you operated aboard a submarine before? Any experience is acceptable. Most experience is concerning.</span>
+      <input type="hidden" id="f-subexp" value=""/>
+      <div class="clown-row" id="subexp-row" style="flex-wrap:wrap;gap:8px;">
+        <button type="button" class="clown-btn" data-val="yes" onclick="setBtnGroup('f-subexp','subexp-row',this)">YES</button>
+        <button type="button" class="clown-btn" data-val="no" onclick="setBtnGroup('f-subexp','subexp-row',this)">NO</button>
+        <button type="button" class="clown-btn" data-val="documentary" onclick="setBtnGroup('f-subexp','subexp-row',this)">I WATCHED A DOCUMENTARY ONCE</button>
+        <button type="button" class="clown-btn" data-val="incident" onclick="setBtnGroup('f-subexp','subexp-row',this)">I WAS ON ONE ONCE BUT THERE WAS AN INCIDENT</button>
+      </div>
+    </div>
 
         <div class="submit-zone">
       <button type="submit" class="submit-btn" id="submitBtn">SUBMIT APPLICATION</button>
@@ -1177,6 +1279,31 @@ function setClown(v) {
   document.getElementById('e-clown').classList.remove('show');
 }
 
+
+// ═══════════ GENERIC BUTTON GROUP ═══════════
+function setBtnGroup(hiddenId, containerId, el) {
+  document.getElementById(hiddenId).value = el.dataset.val;
+  document.querySelectorAll('#' + containerId + ' .clown-btn').forEach(function(b) {
+    b.classList.remove('btn-active','yes-active','no-active');
+  });
+  el.classList.add('btn-active');
+}
+
+// ═══════════ CLOWN MOTHER ═══════════
+function setClownMother(v, el) {
+  document.getElementById('f-clown-saviour').value = v;
+  document.querySelectorAll('#clownmother-row .clown-btn').forEach(function(b) {
+    b.classList.remove('btn-active','yes-active','no-active');
+  });
+  el.classList.add('btn-active');
+  document.getElementById('clown-tithe-notice').style.display = (v === 'yes' || v === 'HONK') ? 'block' : 'none';
+}
+
+// ═══════════ OXYGEN DISCIPLINE ═══════════
+var o2Labels = ['','1 — Iron lungs','2 — Manageable','3 — Noticeable','4 — Concerning','5 — Huffs reserves like a buffet'];
+function updateOxygen(v) {
+  document.getElementById('oxygen-display').textContent = o2Labels[parseInt(v)];
+}
 
 // ═══════════ MCQ OPTIONS ═══════════
 document.querySelectorAll('.mcq-grid').forEach(grid => {
@@ -1363,6 +1490,14 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         why_hire:          document.getElementById('f-whyhire').value.trim(),
         suggestions:       document.getElementById('f-suggestions').value.trim(),
         mod_wishes:        document.getElementById('f-modwishes').value.trim(),
+        badlander_idiot:   document.getElementById('f-badlander').value,
+        hull_breach_method:(document.querySelector('input[name="hull_breach_method"]:checked') || {}).value || '',
+        oxygen_discipline: parseInt(document.getElementById('f-oxygen').value) || 1,
+        warrants:          document.getElementById('f-warrants').value,
+        reactor_beep:      (document.querySelector('input[name="reactor_beep"]:checked') || {}).value || '',
+        blood_type:        document.getElementById('f-bloodtype').value.trim(),
+        clown_saviour:     document.getElementById('f-clown-saviour').value,
+        sub_experience:    document.getElementById('f-subexp').value,
         submitted_at:      new Date().toISOString()
       })
     });
