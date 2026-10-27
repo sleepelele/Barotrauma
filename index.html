@@ -92,7 +92,7 @@
     .section-tag{position:absolute;top:-1px;right:12px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.16em;background:#0d1e2e;padding:2px 8px;border:1px solid var(--border);border-top:none;}
 
     label.field-label{display:block;font-family:'Orbitron',sans-serif;font-size:0.76rem;font-weight:700;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
-    .field-hint{font-family:'Exo 2',sans-serif;font-size:0.85rem;color:var(--text-dim);font-style:italic;letter-spacing:0.03em;margin-bottom:10px;display:block;}
+    .field-hint{font-family:'Exo 2',sans-serif;font-size:0.85rem;color:var(--text);font-style:italic;letter-spacing:0.03em;margin-bottom:10px;display:block;}
 
     input[type="text"],input[type="number"],textarea,select{width:100%;background:rgba(4,10,16,0.75);border:1px solid var(--border);color:var(--text-bright);font-family:'Share Tech Mono',monospace;font-size:0.86rem;padding:10px 12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;-webkit-appearance:none;}
     input[type="text"]:focus,input[type="number"]:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shadow:0 0 0 1px var(--accent-dim),inset 0 0 12px rgba(138,173,90,0.04);background:rgba(4,10,16,0.9);}
@@ -1144,6 +1144,7 @@ If you are reading this notice and still considering applying — welcome. You'r
         <button type="button" class="clown-btn" data-val="no" onclick="setBtnGroup('f-warrants','warrants-row',this)">NO</button>
         <button type="button" class="clown-btn" data-val="define_warrant" onclick="setBtnGroup('f-warrants','warrants-row',this)">DEFINE 'WARRANT'</button>
       </div>
+      <input type="text" id="f-warrants-free" placeholder="Or describe your situation in your own words..." style="margin-top:8px;" oninput="setWarrantsFree(this.value)"/>
     </div>
 
     <!-- FIELD 23: Reactor beep at end of shift (MCQ) -->
@@ -1307,6 +1308,17 @@ function setBtnGroup(hiddenId, containerId, el) {
     b.classList.remove('btn-active','yes-active','no-active');
   });
   el.classList.add('btn-active');
+  // If there's a companion free-text field, clear it
+  var freeInput = document.getElementById(hiddenId.replace('f-','f-') + '-free');
+  if (freeInput) freeInput.value = '';
+}
+
+// ═══════════ WARRANTS FREE TEXT ═══════════
+function setWarrantsFree(v) {
+  document.getElementById('f-warrants').value = v ? ('Free text: ' + v) : '';
+  document.querySelectorAll('#warrants-row .clown-btn').forEach(function(b) {
+    b.classList.remove('btn-active','yes-active','no-active');
+  });
 }
 
 // ═══════════ CLOWN MOTHER ═══════════
