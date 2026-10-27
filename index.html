@@ -930,6 +930,26 @@ If you are reading this notice and still considering applying — welcome. You'r
     </div>
 
 
+    <!-- FIELD 14A: Emergency last transmission -->
+    <div class="section">
+      <span class="section-tag">FIELD 14A</span>
+      <label class="field-label" for="f-lasttransmission">Final Transmission</label>
+      <span class="field-hint">The sub is sinking. You have 30 seconds. What is your final transmission to EuropaCorp command?</span>
+      <textarea id="f-lasttransmission" placeholder="e.g. 'Tell Zez it was his fault.' / 'Sell my kidneys. You know who to call.' / 'I knew the reactor was lying.'"></textarea>
+    </div>
+
+    <!-- FIELD 14B: Character death preference -->
+    <div class="section">
+      <span class="section-tag">FIELD 14B</span>
+      <label class="field-label">Character Death Protocol Preference</label>
+      <span class="field-hint">In the event of character death, which respawn mode do you prefer for the campaign?</span>
+      <div class="mcq-grid" id="mcq-deathmode">
+        <label class="mcq-option"><input type="radio" name="death_mode" value="A) Hardcore — permadeath, new character"/><span class="mcq-letter">A</span><span class="mcq-text">Hardcore — new character on death. Your skills, XP, and dignity are gone.</span></label>
+        <label class="mcq-option"><input type="radio" name="death_mode" value="B) Softcore — respawn next mission"/><span class="mcq-letter">B</span><span class="mcq-text">Softcore — character dies, respawns at the start of next mission. Some XP loss.</span></label>
+        <label class="mcq-option"><input type="radio" name="death_mode" value="C) Shuttle mode — respawn sub deployed"/><span class="mcq-letter">C</span><span class="mcq-text">Shuttle mode — you respawn on a rescue sub and must reconnect to the main vessel. XP loss on death.</span></label>
+      </div>
+    </div>
+
     <!-- BONUS GAMES -->
     <div class="section">
       <span class="section-tag">ASSESSMENT 01</span>
@@ -1490,6 +1510,8 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         why_hire:          document.getElementById('f-whyhire').value.trim(),
         suggestions:       document.getElementById('f-suggestions').value.trim(),
         mod_wishes:        document.getElementById('f-modwishes').value.trim(),
+        last_transmission: document.getElementById('f-lasttransmission').value.trim(),
+        death_mode:        (document.querySelector('input[name="death_mode"]:checked') || {}).value || '',
         badlander_idiot:   document.getElementById('f-badlander').value,
         hull_breach_method:(document.querySelector('input[name="hull_breach_method"]:checked') || {}).value || '',
         oxygen_discipline: parseInt(document.getElementById('f-oxygen').value) || 1,
