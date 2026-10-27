@@ -1066,7 +1066,15 @@ If you are reading this notice and still considering applying — welcome. You'r
       <textarea id="f-suggestions" placeholder="Optional. This field is monitored."></textarea>
     </div>
 
-    
+    <!-- FIELD 18: Mod wishes -->
+    <div class="section">
+      <span class="section-tag">FIELD 18</span>
+      <label class="field-label" for="f-modwishes">Steam Workshop — Mod Requests</label>
+      <span class="field-hint">Any mods you'd like to see in the campaign? List Steam Workshop mod names or IDs. Requests reviewed by command. Clown-themed mods will be ignored. Or installed. Depends on Bullhawk's mood.</span>
+      <textarea id="f-modwishes" placeholder="Optional. e.g. 'More hats', 'Bigger reactor', 'Remove Zez'"></textarea>
+    </div>
+
+
         <div class="submit-zone">
       <button type="submit" class="submit-btn" id="submitBtn">SUBMIT APPLICATION</button>
       <p class="submit-note">// Transmission encrypted — EuropaNet relay — All data logged //</p>
@@ -1354,6 +1362,7 @@ document.getElementById('appForm').addEventListener('submit', async e => {
         declarations:      [...document.querySelectorAll('input[name="decl"]:checked')].map(c=>c.value).join(', '),
         why_hire:          document.getElementById('f-whyhire').value.trim(),
         suggestions:       document.getElementById('f-suggestions').value.trim(),
+        mod_wishes:        document.getElementById('f-modwishes').value.trim(),
         submitted_at:      new Date().toISOString()
       })
     });
@@ -1964,7 +1973,7 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
   // ⚠ SET YOUR DEPARTURE DATE HERE
   // Format: 'Month Day, Year HH:MM:SS'
-  var departureDate = new Date('November 1, 2026 20:00:00');
+  var departureDate = new Date('December 2, 2026 20:00:00');
 
   function pad(n) { return n < 10 ? '0' + n : String(n); }
 
