@@ -816,7 +816,7 @@ If you are reading this notice and still considering applying — welcome. You'r
       </div>
       <div>
         <label class="field-label" for="f-age">Age</label>
-        <input type="number" id="f-age" placeholder="18" min="16" max="99"/>
+        <input type="number" id="f-age" placeholder="18" min="16" max="99" oninput="checkAgeJoke(this.value)"/>
         <span class="err-msg" id="e-age">Valid age required (16–99).</span>
       </div>
     </div>
@@ -1325,6 +1325,35 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.section').forEach(s => { s.style.animationPlayState = 'paused'; observer.observe(s); });
 
 // ═══════════ SALARY ═══════════
+// ═══════════ AGE JOKE ═══════════
+var ageJokeTimer = null;
+var ageJokeMsgs = {
+  69: 'Nice.',
+  67: '67. This will not be tolerated aboard this vessel.'
+};
+
+function checkAgeJoke(v) {
+  var existing = document.getElementById('age-joke-tip');
+  if (existing) existing.remove();
+  if (ageJokeTimer) clearTimeout(ageJokeTimer);
+
+  var msg = ageJokeMsgs[parseInt(v)];
+  if (!msg) return;
+
+  var input = document.getElementById('f-age');
+  var rect = input.getBoundingClientRect();
+  var tip = document.createElement('div');
+  tip.id = 'age-joke-tip';
+  tip.textContent = msg;
+  tip.style.cssText = 'position:fixed;z-index:9999;background:#0d1e2e;border:1px solid var(--rust);border-left:3px solid var(--rust);color:#a8c4d4;font-family:Share Tech Mono,monospace;font-size:0.78rem;letter-spacing:0.06em;padding:8px 14px;pointer-events:none;box-shadow:0 0 16px rgba(196,122,53,0.3);animation:slideUp 0.25s ease;'
+    + 'top:'+(rect.bottom + window.scrollY + 6)+'px;left:'+rect.left+'px;';
+  document.body.appendChild(tip);
+
+  ageJokeTimer = setTimeout(function() {
+    if (tip.parentNode) { tip.style.opacity='0'; tip.style.transition='opacity 0.4s'; setTimeout(function(){ if(tip.parentNode) tip.remove(); }, 400); }
+  }, 3000);
+}
+
 function updateSalary(v) {
   var iv = parseInt(v);
   var display = iv === 6 ? 'Tu ahujel?!' : v + '%';
