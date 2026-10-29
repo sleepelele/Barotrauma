@@ -455,13 +455,13 @@
     .intercept {
       position:fixed; bottom:24px; left:24px; z-index:5000;
       background:#060e15; border:1px solid var(--rust);
-      border-left:3px solid var(--rust);
-      padding:16px 20px; max-width:400px;
-      font-family:'Share Tech Mono',monospace; font-size:0.76rem;
-      color:var(--text-dim); letter-spacing:0.08em; line-height:1.7;
+      border-left:4px solid var(--rust);
+      padding:22px 28px; max-width:520px;
+      font-family:'Share Tech Mono',monospace; font-size:0.96rem;
+      color:var(--text-dim); letter-spacing:0.08em; line-height:1.8;
       pointer-events:none;
       animation:interceptIn 0.4s ease;
-      box-shadow:0 0 20px rgba(196,122,53,0.15);
+      box-shadow:0 0 30px rgba(196,122,53,0.22);
     }
     @keyframes interceptIn {
       from{opacity:0;transform:translateY(12px)}
@@ -473,8 +473,8 @@
       to{opacity:0;transform:translateY(8px)}
     }
     .intercept-header {
-      color:var(--rust); font-size:0.68rem; letter-spacing:0.18em;
-      text-transform:uppercase; margin-bottom:6px;
+      color:var(--rust); font-size:0.86rem; letter-spacing:0.18em;
+      text-transform:uppercase; margin-bottom:8px;
     }
     .intercept-header::before { content:'📡 '; }
 
