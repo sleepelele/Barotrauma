@@ -73,6 +73,14 @@
     .warn-strip{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--warn);border:1px solid rgba(184,132,42,0.22);background:rgba(4,10,16,0.7);padding:10px 16px;margin-bottom:30px;letter-spacing:0.08em;line-height:1.6;opacity:0;animation:slideUp 0.7s 0.5s ease forwards;}
     .warn-strip::before{content:'⚠  ';}
 
+    .crew-archive-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);background:rgba(4,10,16,0.5);border:1px solid var(--border);border-left:3px solid var(--accent-dim);padding:10px 16px;margin-bottom:16px;letter-spacing:0.08em;opacity:0;animation:slideUp 0.7s 0.6s ease forwards;}
+    .crew-archive-lbl{color:var(--accent);font-size:0.63rem;letter-spacing:0.2em;white-space:nowrap;}
+    .crew-archive-sep{color:var(--border2);}
+    .crew-archive-txt{flex:1;min-width:180px;line-height:1.6;}
+    .crew-archive-txt em{color:var(--text);font-style:normal;}
+    .crew-archive-link{color:var(--accent);text-decoration:none;border:1px solid var(--accent-dim);padding:4px 13px;letter-spacing:0.1em;transition:all 0.2s;white-space:nowrap;font-size:0.68rem;}
+    .crew-archive-link:hover{background:rgba(138,173,90,0.09);border-color:var(--accent);box-shadow:var(--glow-g);}
+
     /* Poster block */
     .poster-block{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--rust);padding:24px 26px;margin-bottom:16px;position:relative;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:revealSection 0.6s 0.08s ease both;}
     .poster-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(0.9rem,2.2vw,1.3rem);color:var(--rust);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;text-shadow:var(--glow-r);}
@@ -724,6 +732,14 @@
 
   <div class="warn-strip">
     All personnel must complete this form prior to boarding. Incomplete or falsified applications will result in immediate ejection from the airlock. Clown mother affiliation must be disclosed under Section 14 of the EuropaCorp Employee Conduct Charter.
+  </div>
+
+  <!-- ── CREW ARCHIVE LINK ── -->
+  <div class="crew-archive-bar">
+    <span class="crew-archive-lbl">⬡ CREW ARCHIVE</span>
+    <span class="crew-archive-sep">—</span>
+    <span class="crew-archive-txt">Previous mission recordings recovered from the <em>Dugong</em>'s onboard systems prior to compression. Classified. Leaking anyway.</span>
+    <a href="https://www.youtube.com/watch?v=IR5whANxWt8&list=PLlcHqqJO2yYHGuRcUom-3NiQ1GRyDbx9p&index=2" target="_blank" rel="noopener" class="crew-archive-link">→ VIEW CREW LOGS</a>
   </div>
 
   <!-- ── POSTER / BACKSTORY BLOCK ── -->
